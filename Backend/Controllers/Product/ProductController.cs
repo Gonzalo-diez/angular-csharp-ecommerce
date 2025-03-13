@@ -1,0 +1,160 @@
+using Backend.Identity;
+using Backend.Interfaces;
+using Backend.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.JsonPatch;
+using System.Security.Claims;
+using Backend.Services.Interfaces;
+using Newtonsoft.Json;
+
+namespace Backend.Controllers
+{
+
+    [Route("api/product")]
+    [ApiController]
+    public class ProductController : ControllerBase
+    {
+        private readonly IProductService _productService;
+
+        private readonly IBrowsingHistoryService _browsingHistoryService;
+
+        public ProductController(IProductService productService, IBrowsingHistoryService browsingHistoryService)
+        {
+            _productService = productService;
+            _browsingHistoryService = browsingHistoryService;
+        }
+
+
+        [HttpGet]
+        public async Task<ActionResult<List<Product>>> GetAllProducts([FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice, [FromQuery] ProductCategory? productCategory, [FromQuery] ProductSubCategory? productSubCategory)
+        {
+            return Ok(await _productService.GetAllProducts(minPrice, maxPrice, productCategory, productSubCategory));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Product>> GetProductById(int id, [FromQuery] int? userId, [FromQuery] string? sessionId)
+        {
+            var product = await _productService.GetProductById(id);
+            if (product == null) return NotFound();
+            if (userId.HasValue || !string.IsNullOrEmpty(sessionId))
+            {
+                await _browsingHistoryService.AddToHistoryAsync(userId, sessionId, id);
+            }
+
+
+            return Ok(product);
+        }
+
+        [Authorize(Policy = IdentityRoles.Premium)]
+        [HttpPost("add")]
+        public async Task<ActionResult<Product>> AddProduct(
+        [FromForm] string name,
+        [FromForm] string brand,
+        [FromForm] decimal price,
+        [FromForm] int stock,
+        [FromForm] ProductCategory category,
+        [FromForm] ProductSubCategory subCategory,
+        IFormFile? image)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var userId = int.Parse(userIdClaim);
+
+            var product = new Product
+            {
+                Name = name,
+                Brand = brand,
+                Price = price,
+                Stock = stock,
+                Category = category,
+                SubCategory = subCategory,
+                OwnerId = userId,
+            };
+
+            if (image != null)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(image.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await image.CopyToAsync(fileStream);
+                }
+
+                product.ImageUrl = $"/images/{uniqueFileName}"; // Ruta relativa para acceder desde el frontend
+            }
+
+            var newProduct = await _productService.AddProduct(product);
+            return CreatedAtAction(nameof(GetProductById), new { id = newProduct.Id }, newProduct);
+        }
+
+
+        [Authorize(Policy = IdentityRoles.Premium)]
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<Product>> UpdateProduct(int id, [FromBody] JsonPatchDocument<Product> patchDoc)
+        {
+            if (patchDoc == null)
+            {
+                return BadRequest("Invalid patch document.");
+            }
+
+            // Obtener el userId desde los claims del JWT, asegurándose de que se utiliza el claim correcto
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var userId = int.Parse(userIdClaim);  // Convertir a int el userId desde el claim
+
+            var product = await _productService.GetProductById(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            if (product.OwnerId != userId)
+            {
+                return Unauthorized("You are not authorized to update this product.");
+            }
+
+            // Aplicamos el parche al producto y registramos errores en ModelState
+            patchDoc.ApplyTo(product, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var success = await _productService.UpdateProduct(id, product, userId);
+            if (success == null || !success.Value)
+            {
+                return NotFound();
+            }
+
+
+            return Ok(product);
+        }
+
+
+        [Authorize(Policy = "AdminOrPremium")]
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteProduct(int id, int userId)
+        {
+            var success = await _productService.DeleteProduct(id, userId);
+            if (!success) return NotFound();
+            return NoContent();
+        }
+    }
+}
