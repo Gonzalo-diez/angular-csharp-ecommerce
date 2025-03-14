@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Backend.Constants;
 
 namespace Backend.DTOs
 {
@@ -28,6 +27,6 @@ namespace Backend.DTOs
         [Required]
         public ProductStatus Status { get; set; } = ProductStatus.Enable;
 
-        public int? OwnerId { get; set; } // Opcional si el producto tiene un dueño
+        public int? OwnerId { get; set; }
     }
 }

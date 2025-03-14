@@ -1,3 +1,4 @@
+using Backend.DTOs;
 using Backend.Interfaces;
 using Backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -50,11 +51,11 @@ namespace Backend.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> AddItem([FromBody] AddItemRequest request, [FromQuery] int? userId, [FromQuery] string? sessionId)
+        public async Task<IActionResult> AddItem([FromBody] AddProductToCartDto addProductToCartDto, [FromQuery] int? userId, [FromQuery] string? sessionId)
         {
             try
             {
-                await _cartService.AddProductToCartAsync(userId, sessionId, request.ProductId, request.Quantity);
+                await _cartService.AddProductToCartAsync(userId, sessionId, addProductToCartDto.ProductId, addProductToCartDto.Quantity);
                 return Ok(new { message = "Item added to cart" });
             }
             catch (Exception ex)

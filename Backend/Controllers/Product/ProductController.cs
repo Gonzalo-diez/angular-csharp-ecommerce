@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using System.Security.Claims;
 using Backend.Services.Interfaces;
 using Newtonsoft.Json;
+using Backend.DTOs;
 
 namespace Backend.Controllers
 {
@@ -49,12 +50,7 @@ namespace Backend.Controllers
         [Authorize(Policy = IdentityRoles.Premium)]
         [HttpPost("add")]
         public async Task<ActionResult<Product>> AddProduct(
-        [FromForm] string name,
-        [FromForm] string brand,
-        [FromForm] decimal price,
-        [FromForm] int stock,
-        [FromForm] ProductCategory category,
-        [FromForm] ProductSubCategory subCategory,
+        [FromForm] AddProductDto productDto,
         IFormFile? image)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -67,12 +63,13 @@ namespace Backend.Controllers
 
             var product = new Product
             {
-                Name = name,
-                Brand = brand,
-                Price = price,
-                Stock = stock,
-                Category = category,
-                SubCategory = subCategory,
+                Name = productDto.Name,
+                Brand = productDto.Brand,
+                Price = productDto.Price,
+                Stock = productDto.Stock,
+                Category = productDto.Category,
+                SubCategory = productDto.SubCategory,
+                Status = productDto.Status,
                 OwnerId = userId,
             };
 

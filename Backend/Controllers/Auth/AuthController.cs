@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Backend.Identity;
+using Backend.DTOs;
 
 namespace Backend.Controllers
 {
@@ -30,16 +31,16 @@ namespace Backend.Controllers
 
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             var user = new Auth
             {
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Email = request.Email
+                FirstName = registerDto.FirstName,
+                LastName = registerDto.LastName,
+                Email = registerDto.Email
             };
 
-            var (createdUser, token) = await _authService.RegisterAsync(user, request.Password);
+            var (createdUser, token) = await _authService.RegisterAsync(user, registerDto.Password);
 
             return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, new
             {
@@ -49,12 +50,12 @@ namespace Backend.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var token = await _authService.LoginAsync(request.Email, request.Password);
+            var token = await _authService.LoginAsync(loginDto.Email, loginDto.Password);
             if (token == null)
                 return Unauthorized(new { message = "Invalid credentials" });
 
