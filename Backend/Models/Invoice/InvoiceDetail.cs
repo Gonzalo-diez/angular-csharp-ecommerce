@@ -9,7 +9,7 @@ namespace Backend.Models
         public int Id { get; set; }
 
         [ForeignKey("invoiceId")]
-        public int invoiceId { get; set; }
+        public int InvoiceId { get; set; }
         public Invoice Invoice { get; set; } = null!;
 
         [ForeignKey("ProductId")]

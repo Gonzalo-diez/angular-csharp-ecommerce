@@ -22,6 +22,51 @@ namespace Backend.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Índices en Auth (Users)
+            modelBuilder.Entity<Auth>()
+                .HasIndex(a => a.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<Auth>()
+                .HasIndex(a => a.LastName);
+
+            // Índices en Product
+            modelBuilder.Entity<Product>()
+                .HasIndex(p => p.Name);
+
+            modelBuilder.Entity<Product>()
+                .HasIndex(p => p.Category);
+
+            modelBuilder.Entity<Product>()
+                .HasIndex(p => p.Price);
+
+            // Índices en Cart
+            modelBuilder.Entity<Cart>()
+                .HasIndex(c => c.UserId);
+
+            modelBuilder.Entity<Cart>()
+                .HasIndex(c => c.SessionId);
+
+            // Índices en Purchase
+            modelBuilder.Entity<Purchase>()
+                .HasIndex(p => new { p.UserId, p.PurchaseDate });
+
+            // Índices en Invoice
+            modelBuilder.Entity<Invoice>()
+                .HasIndex(i => i.UserId);
+
+            modelBuilder.Entity<Invoice>()
+                .HasIndex(i => i.Id)
+                .IsUnique();
+
+            modelBuilder.Entity<Invoice>()
+                .HasIndex(i => i.Date);
+
+            // Índices en BrowsingHistory
+            modelBuilder.Entity<BrowsingHistory>()
+                .HasIndex(bh => new { bh.UserId, bh.ProductId });
         }
+
     }
 }

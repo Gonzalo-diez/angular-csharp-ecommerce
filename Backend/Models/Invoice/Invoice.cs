@@ -8,12 +8,11 @@ namespace Backend.Models
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey("userId")]
+        [ForeignKey("UserId")]
         public int? UserId { get; set; }
         public Auth? User { get; set; } = null!;
         public string? SessionId { get; set; }
         public CheckoutRequest CheckoutRequest { get; set; } = null!; 
-        public string TransactionId { get; set; } = string.Empty; // ID del pago
         public decimal Total { get; set; }
         public DateTime Date { get; set; } = DateTime.UtcNow;
 
