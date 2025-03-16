@@ -15,12 +15,14 @@ export class RegisterComponent {
   lastName = '';
   email = '';
   password = '';
+  isAuthenticated = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   register() {
     this.authService.register(this.firstName, this.lastName, this.email, this.password).subscribe({
       next: () => {
+        this.isAuthenticated = true;
         this.router.navigate(['/']);
       },
       error: (err) => {

@@ -10,6 +10,23 @@
     <li><a href="#" class="hover:text-gray-400">Contacto</a></li>
   </ul>
 
+  <div>
+    <button
+      *ngIf="!isAuth"
+      (click)="login()"
+      class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-700"
+    >
+      Login
+    </button>
+    <button
+      *ngIf="isAuth"
+      (click)="logout()"
+      class="bg-red-500 px-4 py-2 rounded hover:bg-red-700"
+    >
+      Logout
+    </button>
+  </div>
+
   <!-- Botón de menú en móviles -->
   <button
     class="md:hidden text-2xl focus:outline-none"
@@ -44,4 +61,13 @@
     <li><a href="#" class="block hover:text-gray-400">Productos</a></li>
     <li><a href="#" class="block hover:text-gray-400">Contacto</a></li>
   </ul>
+
+  <div class="mt-6">
+    <button *ngIf="!isAuth" (click)="login()" class="bg-blue-500 w-full px-4 py-2 rounded hover:bg-blue-700">
+      Login
+    </button>
+    <button *ngIf="isAuth" (click)="logout()" class="bg-red-500 w-full px-4 py-2 rounded hover:bg-red-700">
+      Logout
+    </button>
+  </div>
 </div>

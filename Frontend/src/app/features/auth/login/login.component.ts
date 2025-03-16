@@ -13,12 +13,14 @@ import { AuthService } from '../../../core/services/auth/auth.service';
 export class LoginComponent {
   email = '';
   password = '';
+  isAuthenticated = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   login() {
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
+        this.isAuthenticated = true;
         this.router.navigate(['/']);
       },
       error: (err) => {
