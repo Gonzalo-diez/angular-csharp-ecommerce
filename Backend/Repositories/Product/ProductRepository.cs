@@ -45,6 +45,39 @@ namespace Backend.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async Task<List<Product>> GetProductsByCategory(ProductCategory? productCategory, decimal? minPrice, decimal? maxPrice, ProductSubCategory? productSubCategory)
+        {
+            var query = _context.Products
+                .Where(p => productCategory == null || p.Category == productCategory)
+                .AsQueryable();
+
+            if (minPrice.HasValue)
+                query = query.Where(p => p.Price >= minPrice.Value);
+
+            if (maxPrice.HasValue)
+                query = query.Where(p => p.Price <= maxPrice.Value);
+
+            if (productSubCategory.HasValue)
+                query = query.Where(p => p.SubCategory == productSubCategory.Value);
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<List<Product>> GetProductsBySubCategory(ProductCategory? productCategory, ProductSubCategory? productSubCategory, decimal? minPrice, decimal? maxPrice)
+        {
+            var query = _context.Products
+                .Where(p => productSubCategory == null || p.Category == productCategory && p.SubCategory == productSubCategory)
+                .AsQueryable();
+
+            if (minPrice.HasValue)
+                query = query.Where(p => p.Price >= minPrice.Value);
+
+            if (maxPrice.HasValue)
+                query = query.Where(p => p.Price <= maxPrice.Value);
+                
+            return await query.ToListAsync();
+        }
+
         public async Task<Product> AddProduct(Product product)
         {
             if (!CategoryMappings.SubCategories.ContainsKey(product.Category) ||

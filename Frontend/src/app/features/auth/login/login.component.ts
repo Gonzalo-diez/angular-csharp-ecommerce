@@ -1,5 +1,5 @@
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
 
@@ -10,21 +10,32 @@ import { AuthService } from '../../../core/services/auth/auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   email = '';
   password = '';
-  isAuthenticated = false;
+  isAuth = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
+  ngOnInit(): void {
+    this.authService.isAuthenticated().subscribe((authStatus) => {
+      this.isAuth = authStatus;
+    })
+  }
+
   login() {
+    if(!this.email || !this.password) {
+      console.error('Please complete all fields of this form.')
+      return;
+    }
+
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
-        this.isAuthenticated = true;
+        this.isAuth = true;
         this.router.navigate(['/']);
       },
       error: (err) => {
-        console.error('Error en el login:', err);
+        console.error('Error in login:', err);
       },
     });
   }

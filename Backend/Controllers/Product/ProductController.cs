@@ -47,6 +47,32 @@ namespace Backend.Controllers
             return Ok(product);
         }
 
+        [HttpGet("category/{category}")]
+        public async Task<ActionResult<List<Product>>> GetProductsByCategory(ProductCategory productCategory, [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice, [FromQuery] ProductSubCategory? productSubCategory)
+        {
+            var products = await _productService.GetProductsByCategory(productCategory, minPrice, maxPrice, productSubCategory);
+
+            if (products == null || products.Count == 0)
+            {
+                return NotFound(new { message = "No products found for this category" });
+            }
+
+            return Ok(products);
+        }
+
+        [HttpGet("category/{category}/subcategory/{subcategory}")]
+        public async Task<ActionResult<List<Product>>> GetProductsBySubCategory(ProductCategory productCategory, ProductSubCategory? productSubCategory, [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice)
+        {
+            var products = await _productService.GetProductsByCategory(productCategory, minPrice, maxPrice, productSubCategory);
+
+            if (products == null || products.Count == 0)
+            {
+                return NotFound(new { message = "No products found for this category" });
+            }
+
+            return Ok(products);
+        }
+
         [Authorize(Policy = IdentityRoles.Premium)]
         [HttpPost("add")]
         public async Task<ActionResult<Product>> AddProduct(
