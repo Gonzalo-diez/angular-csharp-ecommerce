@@ -47,10 +47,10 @@ namespace Backend.Controllers
             return Ok(product);
         }
 
-        [HttpGet("category/{category}")]
-        public async Task<ActionResult<List<Product>>> GetProductsByCategory(ProductCategory productCategory, [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice, [FromQuery] ProductSubCategory? productSubCategory)
+        [HttpGet("category/{productCategory}")]
+        public async Task<ActionResult<List<Product>>> GetProductsByCategory(string productCategory, [FromQuery] ProductSubCategory? productSubCategory, [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice)
         {
-            var products = await _productService.GetProductsByCategory(productCategory, minPrice, maxPrice, productSubCategory);
+            var products = await _productService.GetProductsByCategory(productCategory, productSubCategory, minPrice, maxPrice);
 
             if (products == null || products.Count == 0)
             {
@@ -60,10 +60,10 @@ namespace Backend.Controllers
             return Ok(products);
         }
 
-        [HttpGet("category/{category}/subcategory/{subcategory}")]
-        public async Task<ActionResult<List<Product>>> GetProductsBySubCategory(ProductCategory productCategory, ProductSubCategory? productSubCategory, [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice)
+        [HttpGet("category/{productCategory}/subcategory/{productSubCategory}")]
+        public async Task<ActionResult<List<Product>>> GetProductsBySubCategory(string productCategory, string productSubCategory, [FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice)
         {
-            var products = await _productService.GetProductsByCategory(productCategory, minPrice, maxPrice, productSubCategory);
+            var products = await _productService.GetProductsBySubCategory(productCategory, productSubCategory, minPrice, maxPrice);
 
             if (products == null || products.Count == 0)
             {

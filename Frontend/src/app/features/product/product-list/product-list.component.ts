@@ -4,10 +4,11 @@ import { ProductService } from '../../../core/services/product/product.service';
 import { ProductModel } from '../../../core/models/product/product.model';
 import { ProductCategory } from '../../../core/models/product/product-category';
 import { ProductSubCategory } from '../../../core/models/product/product-sub-category';
+import { ProductSharedComponent } from "../product-shared/product-shared.component";
 
 @Component({
   selector: 'app-product-list',
-  imports: [NgIf, NgFor],
+  imports: [ProductSharedComponent],
   standalone: true,
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.css',

@@ -15,6 +15,14 @@ export const routes: Routes = [
         loadComponent: () => import('../app/features/product/product-item/product-item.component').then(m => m.ProductItemComponent)
     },
     {
+        path: 'api/product/category/:category',
+        loadComponent: () => import('../app/features/product/product-category/product-category.component').then(m => m.ProductCategoryComponent)
+    },
+    {
+        path: 'api/product/category/:category/subcategory/:subcategory',
+        loadComponent: () => import('../app/features/product/product-subcategory/product-subcategory.component').then(m => m.ProductSubcategoryComponent)
+    },
+    {
         path: 'api/product/add',
         loadComponent: () => import('../app/features/product/product-add/product-add.component').then(m => m.ProductAddComponent)
     },

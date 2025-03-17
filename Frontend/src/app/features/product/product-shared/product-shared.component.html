@@ -1,0 +1,33 @@
+<div class="container mx-auto p-4">
+  <!-- Mensaje cuando no hay productos -->
+  <div *ngIf="products.length === 0" class="text-center text-gray-500 text-lg">
+    <p>There are no products available.</p>
+  </div>
+
+  <!-- Lista de productos -->
+  <div
+    *ngIf="products.length > 0"
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+  >
+    <div
+      *ngFor="let product of products"
+      class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition"
+    >
+      <img
+        *ngIf="product.imageUrl"
+        [src]="'http://localhost:5169' + product.imageUrl"
+        alt="{{ product.name }}"
+        class="w-full h-48 object-cover rounded-md"
+      />
+
+      <h3 class="text-lg font-semibold mt-2">{{ product.name }}</h3>
+      <p class="text-gray-600"><strong>Brand:</strong> {{ product.brand }}</p>
+      <p class="text-gray-800 font-bold">
+        <strong>Price:</strong> ${{ product.price }}
+      </p>
+      <p class="text-gray-500 text-sm">
+        <strong>Category:</strong> {{ product.category }}
+      </p>
+    </div>
+  </div>
+</div>

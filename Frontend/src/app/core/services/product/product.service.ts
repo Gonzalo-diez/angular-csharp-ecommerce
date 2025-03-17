@@ -36,6 +36,33 @@ export class ProductService {
     return this.http.get<ProductModel>(`${this.apiUrl}/${id}`, { params });
   }
 
+  getAllProductsByCategory(
+    category?: string,
+    minPrice?: number,
+    maxPrice?: number,
+    subCategory?: string
+  ): Observable<ProductModel[]> {
+    let params: any = {};
+    if (minPrice !== undefined) params.minPrice = minPrice;
+    if (maxPrice !== undefined) params.maxPrice = maxPrice;
+    if (subCategory) params.subCategory = subCategory;
+
+    return this.http.get<ProductModel[]>(`${this.apiUrl}/category/${category}`, { params });
+  }
+
+  getAllProductsBySubCategory(
+    category?: string,
+    subCategory?: string,
+    minPrice?: number,
+    maxPrice?: number,
+  ): Observable<ProductModel[]> {
+    let params: any = {};
+    if (minPrice !== undefined) params.minPrice = minPrice;
+    if (maxPrice !== undefined) params.maxPrice = maxPrice;
+
+    return this.http.get<ProductModel[]>(`${this.apiUrl}/category/${category}/subcategory/${subCategory}`, { params });
+  }
+
   // Agregar un producto (requiere autenticación)
   addProduct(product: ProductModel, image?: File): Observable<ProductModel> {
     const formData = new FormData();

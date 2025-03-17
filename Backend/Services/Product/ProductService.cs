@@ -29,12 +29,12 @@ namespace Backend.Services
             return await _productRepository.GetProductById(id);
         }
 
-        public async Task<List<Product>> GetProductsByCategory(ProductCategory? productCategory, decimal? minPrice, decimal? maxPrice, ProductSubCategory? productSubCategory)
+        public async Task<List<Product>> GetProductsByCategory(string productCategory, ProductSubCategory? productSubCategory, decimal? minPrice, decimal? maxPrice)
         {
-            return await _productRepository.GetProductsByCategory(productCategory, minPrice, maxPrice, productSubCategory);
+            return await _productRepository.GetProductsByCategory(productCategory, productSubCategory, minPrice, maxPrice);
         }
 
-        public async Task<List<Product>> GetProductsBySubCategory(ProductCategory? productCategory, ProductSubCategory? productSubCategory, decimal? minPrice, decimal? maxPrice)
+        public async Task<List<Product>> GetProductsBySubCategory(string productCategory, string productSubCategory, decimal? minPrice, decimal? maxPrice)
         {
             return await _productRepository.GetProductsBySubCategory(productCategory, productSubCategory, minPrice, maxPrice);
         }

@@ -45,36 +45,67 @@ namespace Backend.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<List<Product>> GetProductsByCategory(ProductCategory? productCategory, decimal? minPrice, decimal? maxPrice, ProductSubCategory? productSubCategory)
+        public async Task<List<Product>> GetProductsByCategory(
+            string productCategory,
+            ProductSubCategory? productSubCategory,
+            decimal? minPrice,
+            decimal? maxPrice)
         {
-            var query = _context.Products
-                .Where(p => productCategory == null || p.Category == productCategory)
-                .AsQueryable();
+            var query = _context.Products.AsQueryable();
+
+            // Convertir la categoría de string a enum (si es válida)
+            if (Enum.TryParse<ProductCategory>(productCategory, true, out var categoryEnum))
+            {
+                query = query.Where(p => p.Category == categoryEnum);
+            }
+            else
+            {
+                throw new ArgumentException($"La categoría '{productCategory}' no es válida.");
+            }
+
+            // Filtrar por subcategoría si se proporciona
+            if (productSubCategory.HasValue)
+                query = query.Where(p => p.SubCategory == productSubCategory.Value);
 
             if (minPrice.HasValue)
                 query = query.Where(p => p.Price >= minPrice.Value);
 
             if (maxPrice.HasValue)
                 query = query.Where(p => p.Price <= maxPrice.Value);
-
-            if (productSubCategory.HasValue)
-                query = query.Where(p => p.SubCategory == productSubCategory.Value);
 
             return await query.ToListAsync();
         }
 
-        public async Task<List<Product>> GetProductsBySubCategory(ProductCategory? productCategory, ProductSubCategory? productSubCategory, decimal? minPrice, decimal? maxPrice)
+        public async Task<List<Product>> GetProductsBySubCategory(
+            string productCategory,
+            string productSubCategory,
+            decimal? minPrice,
+            decimal? maxPrice)
         {
-            var query = _context.Products
-                .Where(p => productSubCategory == null || p.Category == productCategory && p.SubCategory == productSubCategory)
-                .AsQueryable();
+            var query = _context.Products.AsQueryable();
+
+            // Convertir la categoría de string a enum (si es válida)
+            if (Enum.TryParse<ProductCategory>(productCategory, true, out var categoryEnum))
+            {
+                query = query.Where(p => p.Category == categoryEnum);
+            }
+            else
+            {
+                throw new ArgumentException($"La categoría '{productCategory}' no es válida.");
+            }
+
+            // Filtrar por subcategoría si se proporciona
+            if (Enum.TryParse<ProductSubCategory>(productSubCategory, true, out var subCategoryEnum))
+            {
+                query = query.Where(p => p.SubCategory == subCategoryEnum);
+            }
 
             if (minPrice.HasValue)
                 query = query.Where(p => p.Price >= minPrice.Value);
 
             if (maxPrice.HasValue)
                 query = query.Where(p => p.Price <= maxPrice.Value);
-                
+
             return await query.ToListAsync();
         }
 
