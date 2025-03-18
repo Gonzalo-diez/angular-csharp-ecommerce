@@ -11,7 +11,6 @@ namespace Backend.Models
         [ForeignKey("UserId")]
         public int? UserId { get; set; }
         public Auth? User { get; set; } = null!;
-        public string? SessionId { get; set; }
         public CheckoutRequest CheckoutRequest { get; set; } = null!; 
         public decimal Total { get; set; }
         public DateTime Date { get; set; } = DateTime.UtcNow;

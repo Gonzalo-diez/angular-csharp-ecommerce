@@ -45,9 +45,6 @@ namespace Backend.Data
             modelBuilder.Entity<Cart>()
                 .HasIndex(c => c.UserId);
 
-            modelBuilder.Entity<Cart>()
-                .HasIndex(c => c.SessionId);
-
             // Índices en Purchase
             modelBuilder.Entity<Purchase>()
                 .HasIndex(p => new { p.UserId, p.PurchaseDate });

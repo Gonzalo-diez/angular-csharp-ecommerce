@@ -30,16 +30,20 @@ namespace Backend.Repositories
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<Purchase>> GetByUserIdOrSessionIdAsync(int? userId, string? sessionId)
+        public IQueryable<Purchase> GetPurchases(int? userId)
         {
-            return await _context.Purchases
-                .Where(p => (userId != null && p.UserId == userId) || (sessionId != null && p.SessionId == sessionId))
-                .Include(p => p.User)
+            return _context.Purchases
+                        .Where(p => userId != null && p.UserId == userId);
+        }
+
+        public async Task<IEnumerable<Purchase>> GetByUserIdAsync(int? userId)
+        {
+            return await _context.Purchases.Include(p => p.UserId == userId)
                 .Include(p => p.Product)
                 .ToListAsync();
         }
 
-        public async Task<Purchase> CreateAsync(Purchase purchase, string? sessionId)
+        public async Task<Purchase> CreateAsync(Purchase purchase)
         {
             _context.Purchases.Add(purchase);
             await _context.SaveChangesAsync();

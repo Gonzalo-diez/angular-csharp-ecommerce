@@ -3,7 +3,7 @@ using Backend.Models;
 public interface ICartRepository
 {
     // Obtener el carrito de un usuario por su UserId
-    Task<Cart?> GetCartByUserIdOrSessionIdAsync(int? userId, string? sessionId);
+    Task<Cart?> GetCartByUserIdAsync(int? userId);
 
     Task CreateAsync(Cart cart);
 
@@ -14,5 +14,5 @@ public interface ICartRepository
     Task UpdateAsync(Cart cart);
 
     // Eliminar un carrito por UserId
-    Task DeleteByUserIdOrSessionIdAsync(int? userId, string? sessionId);
+    Task DeleteByUserIdAsync(int? userId);
 }

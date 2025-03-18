@@ -6,8 +6,8 @@ namespace Backend.Interfaces
     {
         Task<IEnumerable<Purchase>> GetAllPurchasesAsync();
         Task<Purchase?> GetPurchaseByIdAsync(int id);
-        Task<IEnumerable<Purchase>> GetPurchasesByUserIdOrSessionIdAsync(int? userId, string? sessionId);
-        Task<Purchase> CreatePurchaseAsync(int? userId, string? sessionId, Product product, int quantity);
+        Task<IEnumerable<Purchase>> GetPurchasesByUserIdAsync(int? userId);
+        Task<Purchase> CreatePurchaseAsync(int? userId, Product product, int quantity);
         Task<bool> DeletePurchaseAsync(int id);
     }
 }

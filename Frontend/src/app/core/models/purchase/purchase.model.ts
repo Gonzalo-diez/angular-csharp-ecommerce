@@ -5,7 +5,6 @@ export interface PurchaseModel {
   id: number;
   userId?: number;  // Opcional porque puede ser null en el backend
   user?: AuthModel;      // Usuario que compró (puede ser null)
-  sessionId?: string; // ID de sesión (opcional)
   productId: number; // ID del producto comprado
   product: ProductModel;  // Información del producto comprado
   quantity: number;  // Cantidad comprada

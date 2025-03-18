@@ -6,7 +6,6 @@ export interface InvoiceModel {
     id: number; 
     userId?: number;
     user?: AuthModel;
-    sessionId?: string;
     checkoutRequest: CheckoutRequestModel;
     transactionId: string;
     total: number;

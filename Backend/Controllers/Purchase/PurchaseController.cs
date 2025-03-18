@@ -34,16 +34,16 @@ namespace Backend.Controllers
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetByUserId([FromQuery] int? userId, [FromQuery] string? sessionId)
+        public async Task<IActionResult> GetByUserId([FromQuery] int? userId)
         {
-            var purchases = await _purchaseService.GetPurchasesByUserIdOrSessionIdAsync(userId, sessionId);
+            var purchases = await _purchaseService.GetPurchasesByUserIdAsync(userId);
             return Ok(purchases);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] PurchaseRequest request, [FromQuery] int? userId, [FromQuery] string? sessionId)
+        public async Task<IActionResult> Create([FromBody] PurchaseRequest request)
         {
-            var purchase = await _purchaseService.CreatePurchaseAsync(request.UserId, sessionId, request.Product, request.Quantity);
+            var purchase = await _purchaseService.CreatePurchaseAsync(request.UserId, request.Product, request.Quantity);
             return CreatedAtAction(nameof(GetById), new { id = purchase.Id }, purchase);
         }
 

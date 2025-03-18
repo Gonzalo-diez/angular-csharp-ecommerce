@@ -34,13 +34,13 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProductById(int id, [FromQuery] int? userId, [FromQuery] string? sessionId)
+        public async Task<ActionResult<Product>> GetProductById(int id, [FromQuery] int? userId)
         {
             var product = await _productService.GetProductById(id);
             if (product == null) return NotFound();
-            if (userId.HasValue || !string.IsNullOrEmpty(sessionId))
+            if (userId.HasValue)
             {
-                await _browsingHistoryService.AddToHistoryAsync(userId, sessionId, id);
+                await _browsingHistoryService.AddToHistoryAsync(userId, id);
             }
 
 

@@ -23,23 +23,22 @@ namespace Backend.Services
             return await _purchaseRepository.GetByIdAsync(id);
         }
 
-        public async Task<IEnumerable<Purchase>> GetPurchasesByUserIdOrSessionIdAsync(int? userId, string? sessionId)
+        public async Task<IEnumerable<Purchase>> GetPurchasesByUserIdAsync(int? userId)
         {
-            return await _purchaseRepository.GetByUserIdOrSessionIdAsync(userId, sessionId);
+            return await _purchaseRepository.GetByUserIdAsync(userId);
         }
 
-        public async Task<Purchase> CreatePurchaseAsync(int? userId, string? sessionId, Product product, int quantity)
+        public async Task<Purchase> CreatePurchaseAsync(int? userId, Product product, int quantity)
         {   
             var purchase = new Purchase
             {
                 UserId = userId,
-                SessionId = sessionId,
                 ProductId = product.Id,
                 Product = product,
                 Quantity = quantity
             };
 
-            return await _purchaseRepository.CreateAsync(purchase, sessionId);
+            return await _purchaseRepository.CreateAsync(purchase);
         }
 
         public async Task<bool> DeletePurchaseAsync(int id)

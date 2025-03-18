@@ -28,10 +28,9 @@ export class ProductService {
   }
 
   // Obtener un producto por ID
-  getProductById(id: number, userId?: number, sessionId?: string): Observable<ProductModel> {
+  getProductById(id: number, userId?: number, ): Observable<ProductModel> {
     let params: any = {};
     if (userId) params.userId = userId;
-    if (sessionId) params.sessionId = sessionId;
 
     return this.http.get<ProductModel>(`${this.apiUrl}/${id}`, { params });
   }

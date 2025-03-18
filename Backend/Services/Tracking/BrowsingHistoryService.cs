@@ -13,12 +13,11 @@ namespace Backend.Services
             _browsingHistoryRepository = browsingHistoryRepository;
         }
 
-        public async Task AddToHistoryAsync(int? userId, string? sessionId, int productId)
+        public async Task AddToHistoryAsync(int? userId, int productId)
         {
             var history = new BrowsingHistory
             {
                 UserId = userId,
-                SessionId = sessionId,
                 ProductId = productId,
                 DateTime = DateTime.UtcNow
             };

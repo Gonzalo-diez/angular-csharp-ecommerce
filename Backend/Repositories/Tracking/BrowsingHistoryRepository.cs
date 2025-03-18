@@ -23,7 +23,7 @@ namespace Backend.Repositories
         {
             return await _context.BrowsingHistories
                 .Where(h => h.UserId == userId)
-                .Include(h => h.Product) // Opcional: incluir datos del producto
+                .Include(h => h.Product)
                 .OrderByDescending(h => h.DateTime)
                 .ToListAsync();
         }

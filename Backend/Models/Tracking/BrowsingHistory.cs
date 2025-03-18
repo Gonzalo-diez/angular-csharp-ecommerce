@@ -12,8 +12,6 @@ namespace Backend.Models
         public int? UserId { get; set; }
         public Auth? User { get; set; } = null!;
 
-        public string? SessionId { get; set; } 
-
         [ForeignKey("ProductId")]
         public int ProductId { get; set; }
         public Product Product { get; set; } = null!;

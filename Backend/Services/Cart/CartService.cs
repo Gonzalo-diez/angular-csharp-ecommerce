@@ -13,17 +13,17 @@ public class CartService : ICartService
     }
 
     // Obtener el carrito de un usuario por su UserId
-    public async Task<Cart?> GetCartByUserIdOrSessionIdAsync(int? userId, string? sessionId)
+    public async Task<Cart?> GetCartByUserIdAsync(int? userId)
     {
-        return await _cartRepository.GetCartByUserIdOrSessionIdAsync(userId, sessionId);
+        return await _cartRepository.GetCartByUserIdAsync(userId);
     }
 
     // Crear un carrito para un usuario si no tiene uno
-    public async Task<Cart> CreateCartAsync(Auth? user, string? sessionId)
+    public async Task<Cart> CreateCartAsync(Auth? user)
     {
         int? userId = user?.Id; // Si user es null, userId será null
 
-        var existingCart = await _cartRepository.GetCartByUserIdOrSessionIdAsync(userId, sessionId);
+        var existingCart = await _cartRepository.GetCartByUserIdAsync(userId);
         if (existingCart != null)
         {
             return existingCart; // Si ya tiene un carrito, lo devolvemos
@@ -34,13 +34,9 @@ public class CartService : ICartService
         {
             newCart = new Cart(user);
         }
-        else if (!string.IsNullOrEmpty(sessionId))
-        {
-            newCart = new Cart(sessionId);
-        }
         else
         {
-            throw new ArgumentException("Debe proporcionar un usuario o una sessionId.");
+            throw new ArgumentException("Debe proporcionar un usuario.");
         }
 
         await _cartRepository.AddAsync(newCart);
@@ -48,9 +44,9 @@ public class CartService : ICartService
     }
 
     // Agregar un producto al carrito
-    public async Task<Cart?> AddProductToCartAsync(int? userId, string? sessionId, int productId, int quantity)
+    public async Task<Cart?> AddProductToCartAsync(int? userId, int productId, int quantity)
     {
-        var cart = await _cartRepository.GetCartByUserIdOrSessionIdAsync(userId, sessionId);
+        var cart = await _cartRepository.GetCartByUserIdAsync(userId);
 
         // 🔴 SOLUCIÓN: Si el carrito no existe, crearlo correctamente
         if (cart == null)
@@ -58,7 +54,6 @@ public class CartService : ICartService
             cart = new Cart
             {
                 UserId = userId,
-                SessionId = sessionId, // 🟢 Agregar sessionId cuando no hay userId
                 Items = new List<CartItem>()
             };
 
@@ -87,9 +82,9 @@ public class CartService : ICartService
     }
 
     // Eliminar un producto del carrito
-    public async Task<Cart?> RemoveProductFromCartAsync(int? userId, string? sessionId, int productId)
+    public async Task<Cart?> RemoveProductFromCartAsync(int? userId, int productId)
     {
-        var cart = await _cartRepository.GetCartByUserIdOrSessionIdAsync(userId, sessionId);
+        var cart = await _cartRepository.GetCartByUserIdAsync(userId);
         if (cart == null)
         {
             return null;
@@ -106,9 +101,9 @@ public class CartService : ICartService
     }
 
     // Vaciar el carrito completamente
-    public async Task<Cart?> ClearCartAsync(int? userId, string? sessionId)
+    public async Task<Cart?> ClearCartAsync(int? userId)
     {
-        var cart = await _cartRepository.GetCartByUserIdOrSessionIdAsync(userId, sessionId);
+        var cart = await _cartRepository.GetCartByUserIdAsync(userId);
         if (cart == null)
         {
             return null;

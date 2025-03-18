@@ -12,19 +12,13 @@ public class CartRepository : ICartRepository
     }
 
     // Obtener el carrito de un usuario por su UserId
-    public async Task<Cart?> GetCartByUserIdOrSessionIdAsync(int? userId, string? sessionId)
+    public async Task<Cart?> GetCartByUserIdAsync(int? userId)
     {
         if (userId.HasValue)
         {
             return await _context.Carts
                 .Include(c => c.Items)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
-        }
-        else if (!string.IsNullOrEmpty(sessionId))
-        {
-            return await _context.Carts
-                .Include(c => c.Items)
-                .FirstOrDefaultAsync(c => c.SessionId == sessionId);
         }
 
         return null;
@@ -52,10 +46,9 @@ public class CartRepository : ICartRepository
     }
 
     // Eliminar un carrito por UserId (opcional)
-    public async Task DeleteByUserIdOrSessionIdAsync(int? userId, string? sessionId)
+    public async Task DeleteByUserIdAsync(int? userId)
     {
-        var cart = await _context.Carts.FirstOrDefaultAsync(c => (userId != null && c.UserId == userId) ||
-                                  (sessionId != null && c.SessionId == sessionId));
+        var cart = await _context.Carts.FirstOrDefaultAsync(c => userId != null && c.UserId == userId);
         if (cart != null)
         {
             _context.Carts.Remove(cart);

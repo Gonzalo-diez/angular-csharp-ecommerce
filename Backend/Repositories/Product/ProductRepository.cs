@@ -144,7 +144,7 @@ namespace Backend.Repositories
             return true;
         }
 
-        public async Task<bool?> UpdateProductPurchase(int id, Product updatedProduct, int? userId, string? sessionId)
+        public async Task<bool?> UpdateProductPurchase(int id, Product updatedProduct, int? userId)
         {
             var product = await GetProductById(id);
             if (product == null || product.OwnerId != userId)

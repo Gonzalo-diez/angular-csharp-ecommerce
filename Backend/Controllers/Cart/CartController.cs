@@ -37,11 +37,11 @@ namespace Backend.Controllers
         }
 
         [HttpGet("")]
-        public async Task<IActionResult> GetCart([FromQuery] int? userId, [FromQuery] string? sessionId)
+        public async Task<IActionResult> GetCart([FromQuery] int? userId)
         {
             try
             {
-                var cart = await _cartService.GetCartByUserIdOrSessionIdAsync(userId, sessionId);
+                var cart = await _cartService.GetCartByUserIdAsync(userId);
                 return Ok(cart);
             }
             catch (Exception ex)
@@ -51,11 +51,11 @@ namespace Backend.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> AddItem([FromBody] AddProductToCartDto addProductToCartDto, [FromQuery] int? userId, [FromQuery] string? sessionId)
+        public async Task<IActionResult> AddItem([FromBody] AddProductToCartDto addProductToCartDto, [FromQuery] int? userId)
         {
             try
             {
-                await _cartService.AddProductToCartAsync(userId, sessionId, addProductToCartDto.ProductId, addProductToCartDto.Quantity);
+                await _cartService.AddProductToCartAsync(userId, addProductToCartDto.ProductId, addProductToCartDto.Quantity);
                 return Ok(new { message = "Item added to cart" });
             }
             catch (Exception ex)
@@ -65,12 +65,12 @@ namespace Backend.Controllers
         }
 
         [HttpPost("checkout")]
-        public async Task<IActionResult> Checkout([FromBody] CheckoutRequest request, [FromQuery] int? userId, [FromQuery] string? sessionId)
+        public async Task<IActionResult> Checkout([FromBody] CheckoutRequest request, [FromQuery] int? userId)
         {
             try
             {
                 // Obtener el carrito del usuario
-                var cart = await _cartService.GetCartByUserIdOrSessionIdAsync(userId, sessionId);
+                var cart = await _cartService.GetCartByUserIdAsync(userId);
                 if (cart == null || !cart.Items.Any())
                 {
                     return BadRequest(new { message = "El carrito está vacío." });
@@ -107,17 +107,16 @@ namespace Backend.Controllers
 
                     // Restar stock
                     product.Stock -= cartItem.Quantity;
-                    await _productService.UpdateProductPurchase(cartItem.ProductId, product, userId, sessionId);
+                    await _productService.UpdateProductPurchase(cartItem.ProductId, product, userId);
 
                     // Crear compra
-                    await _purchaseService.CreatePurchaseAsync(userId, sessionId, product, cartItem.Quantity);
+                    await _purchaseService.CreatePurchaseAsync(userId, product, cartItem.Quantity);
                 }
 
                 // Crear la factura antes de vaciar el carrito
                 var invoice = new Invoice
                 {
                     UserId = userId,
-                    SessionId = sessionId,
                     CheckoutRequest = request,
                     Total = cart.Items.Sum(item => item.Product.Price * item.Quantity),
                     Details = cart.Items.Select(item => new InvoiceDetail
@@ -143,7 +142,7 @@ namespace Backend.Controllers
                     var paymentSessionUrl = await _paymentService.CreateStripePaymentSessionAsync(cart.Items);
                     if (!string.IsNullOrEmpty(paymentSessionUrl))
                     {
-                        await _cartService.ClearCartAsync(userId, sessionId);
+                        await _cartService.ClearCartAsync(userId);
                         return Ok(new { message = "Compra completada con éxito.", paymentUrl = paymentSessionUrl, pdfUrl = pdfFile });
                     }
                     else
@@ -159,7 +158,7 @@ namespace Backend.Controllers
                         var paymentUrl = await _paymentService.CreateMercadoPagoPreferenceAsync(cart.Items);
                         if (!string.IsNullOrEmpty(paymentUrl))
                         {
-                            await _cartService.ClearCartAsync(userId, sessionId);
+                            await _cartService.ClearCartAsync(userId);
                             return Ok(new { message = "Compra completada con éxito.", paymentUrl, pdfUrl = pdfFile });
                         }
                         else
@@ -185,11 +184,11 @@ namespace Backend.Controllers
 
 
         [HttpDelete("remove/{productId}")]
-        public async Task<IActionResult> RemoveItem(int productId, [FromQuery] int? userId, [FromQuery] string? sessionId)
+        public async Task<IActionResult> RemoveItem(int productId, [FromQuery] int? userId)
         {
             try
             {
-                var cart = await _cartService.GetCartByUserIdOrSessionIdAsync(userId, sessionId);
+                var cart = await _cartService.GetCartByUserIdAsync(userId);
                 if (cart == null)
                 {
                     return NotFound();
@@ -200,7 +199,7 @@ namespace Backend.Controllers
                     return Unauthorized("You are not authorized to delete this product from this cart.");
                 }
 
-                await _cartService.RemoveProductFromCartAsync(userId, sessionId, productId);
+                await _cartService.RemoveProductFromCartAsync(userId, productId);
                 return Ok(new { message = "Item removed from cart" });
             }
             catch (Exception ex)
@@ -210,11 +209,11 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("clear")]
-        public async Task<IActionResult> ClearCart([FromQuery] int? userId, [FromQuery] string? sessionId)
+        public async Task<IActionResult> ClearCart([FromQuery] int? userId)
         {
             try
             {
-                var cart = await _cartService.GetCartByUserIdOrSessionIdAsync(userId, sessionId);
+                var cart = await _cartService.GetCartByUserIdAsync(userId);
                 if (cart == null)
                 {
                     return NotFound();
@@ -225,7 +224,7 @@ namespace Backend.Controllers
                     return Unauthorized("You are not authorized to clear this cart.");
                 }
 
-                await _cartService.ClearCartAsync(userId, sessionId);
+                await _cartService.ClearCartAsync(userId);
                 return Ok(new { message = "Cart cleared" });
             }
             catch (Exception ex)

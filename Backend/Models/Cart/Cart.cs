@@ -13,7 +13,6 @@ namespace Backend.Models
 
         public Auth? User { get; set; } = null!;
 
-        public string? SessionId { get; set; }
 
         public List<CartItem> Items { get; set; } = new List<CartItem>();
 
@@ -27,12 +26,6 @@ namespace Backend.Models
         {
             User = user;
             UserId = user.Id; // Asegura que UserId también se establezca
-            Items = new List<CartItem>();
-        }
-
-        public Cart(string sessionId)
-        {
-            SessionId = sessionId;
             Items = new List<CartItem>();
         }
     }

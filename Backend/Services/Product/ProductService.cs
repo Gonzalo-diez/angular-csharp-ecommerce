@@ -54,14 +54,14 @@ namespace Backend.Services
             return await _productRepository.UpdateProduct(id, updatedProduct, userId);
         }
 
-        public async Task<bool?> UpdateProductPurchase(int id, Product updatedProduct, int? userId, string? sessionId)
+        public async Task<bool?> UpdateProductPurchase(int id, Product updatedProduct, int? userId)
         {
             if (updatedProduct.Stock <= 0)
             {
                 updatedProduct.Status = ProductStatus.Out_Of_Stock;
             }
 
-            return await _productRepository.UpdateProductPurchase(id, updatedProduct, userId, sessionId);
+            return await _productRepository.UpdateProductPurchase(id, updatedProduct, userId);
         }
 
         public async Task NotifyOwnerLowStock(int? ownerId, Product product)

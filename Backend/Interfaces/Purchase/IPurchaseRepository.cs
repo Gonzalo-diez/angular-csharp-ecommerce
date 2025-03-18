@@ -6,8 +6,8 @@ namespace Backend.Repositories.Interfaces
     {
         Task<IEnumerable<Purchase>> GetAllAsync();
         Task<Purchase?> GetByIdAsync(int id);
-        Task<IEnumerable<Purchase>> GetByUserIdOrSessionIdAsync(int? userId, string? sessionId);
-        Task<Purchase> CreateAsync(Purchase purchase, string? sessionId);
+        Task<IEnumerable<Purchase>> GetByUserIdAsync(int? userId);
+        Task<Purchase> CreateAsync(Purchase purchase);
         Task<bool> DeleteAsync(int id);
     }
 }
