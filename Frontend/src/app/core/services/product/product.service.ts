@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { ProductModel } from '../../models/product/product.model';
 
 @Injectable({
@@ -46,7 +47,9 @@ export class ProductService {
     if (maxPrice !== undefined) params.maxPrice = maxPrice;
     if (subCategory) params.subCategory = subCategory;
 
-    return this.http.get<ProductModel[]>(`${this.apiUrl}/category/${category}`, { params });
+    return this.http.get<ProductModel[]>(`${this.apiUrl}/category/${category}`, { params }).pipe(
+      catchError((error: HttpErrorResponse) => this.handleErrorCategory(error, category))
+    );
   }
 
   getAllProductsBySubCategory(
@@ -59,7 +62,9 @@ export class ProductService {
     if (minPrice !== undefined) params.minPrice = minPrice;
     if (maxPrice !== undefined) params.maxPrice = maxPrice;
 
-    return this.http.get<ProductModel[]>(`${this.apiUrl}/category/${category}/subcategory/${subCategory}`, { params });
+    return this.http.get<ProductModel[]>(`${this.apiUrl}/category/${category}/subcategory/${subCategory}`, { params }).pipe(
+      catchError((error: HttpErrorResponse) => this.handleErrorSubCategory(error, category, subCategory)
+    ));
   }
 
   // Agregar un producto (requiere autenticación)
@@ -110,5 +115,23 @@ export class ProductService {
       headers = headers.set('Content-Type', 'application/json');
     }
     return headers;
+  }
+
+  private handleErrorCategory(error: HttpErrorResponse, category?: string) {
+    if (error.status === 404) {
+      console.error(`No se encontraron productos para la categoría '${category}'`);
+      return throwError(() => new Error(`No hay productos disponibles en esta categoría`));
+    }
+    console.error('Ocurrió un error:', error);
+    return throwError(() => new Error('Algo salió mal, intenta nuevamente más tarde.'));
+  }
+
+  private handleErrorSubCategory(error: HttpErrorResponse, category?: string, subCategory?: string) {
+    if (error.status === 404) {
+      console.error(`No se encontraron productos para la categoría '${category}' y subcategoría '${subCategory || 'N/A'}'.`);
+      return throwError(() => new Error(`No hay productos disponibles en esta categoría o subcategoría.`));
+    }
+    console.error('Ocurrió un error:', error);
+    return throwError(() => new Error('Algo salió mal, intenta nuevamente más tarde.'));
   }
 }
