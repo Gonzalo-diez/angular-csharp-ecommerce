@@ -29,7 +29,7 @@ export class NavbarComponent implements OnInit {
   }
 
   login() {
-    window.location.href = '/api/auth/login';
+    window.location.href = '/auth/login';
   }
 
   logout() {

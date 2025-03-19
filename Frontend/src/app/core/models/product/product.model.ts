@@ -5,7 +5,7 @@ import { AuthModel } from '../auth/auth.model';
 import { PurchaseModel } from '../purchase/purchase.model';
 
 export interface ProductModel {
-  id: number;
+  id?: number;
   name: string;
   brand: string;
   price: number;

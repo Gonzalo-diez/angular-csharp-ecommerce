@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProductService } from '../../../core/services/product/product.service';
 import { ProductModel } from '../../../core/models/product/product.model';
-import { NgClass } from '@angular/common';
+import { NgClass, isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-product-item',
@@ -19,14 +19,17 @@ export class ProductItemComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
+    @Inject(PLATFORM_ID) private platformId: any // Inyección para detectar si es navegador o SSR
   ) {}
 
   ngOnInit(): void {
     // Obtener el ID del producto desde la URL
     this.productId = Number(this.route.snapshot.paramMap.get('id'));
 
-    // Obtener el userId si el usuario está logueado
-    this.userId = Number(localStorage.getItem('userId')) || undefined;
+    // Verificar si estamos en el navegador antes de acceder a localStorage
+    if (isPlatformBrowser(this.platformId)) {
+      this.userId = Number(localStorage.getItem('userId')) || undefined;
+    }
 
     // Cargar el producto
     if (this.productId) {
