@@ -124,22 +124,19 @@ namespace Backend.Controllers
 
 
         [Authorize(Policy = IdentityRoles.Premium)]
-        [HttpPatch("{id}")]
-        public async Task<ActionResult<Product>> UpdateProduct(int id, [FromBody] JsonPatchDocument<Product> patchDoc)
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Product>> UpdateProduct(
+            int id,
+            [FromForm] UpdateProductDto productDto,
+            IFormFile? image)
         {
-            if (patchDoc == null)
-            {
-                return BadRequest("Invalid patch document.");
-            }
-
-            // Obtener el userId desde los claims del JWT, asegurándose de que se utiliza el claim correcto
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim))
             {
                 return Unauthorized("User ID not found in token.");
             }
 
-            var userId = int.Parse(userIdClaim);  // Convertir a int el userId desde el claim
+            var userId = int.Parse(userIdClaim);
 
             var product = await _productService.GetProductById(id);
             if (product == null)
@@ -152,23 +149,45 @@ namespace Backend.Controllers
                 return Unauthorized("You are not authorized to update this product.");
             }
 
-            // Aplicamos el parche al producto y registramos errores en ModelState
-            patchDoc.ApplyTo(product, ModelState);
+            // Actualizar los campos si los datos están presentes en productDto
+            if (!string.IsNullOrEmpty(productDto.Name)) product.Name = productDto.Name;
+            if (!string.IsNullOrEmpty(productDto.Brand)) product.Brand = productDto.Brand;
+            if (productDto.Price.HasValue) product.Price = productDto.Price.Value;
+            if (productDto.Stock.HasValue) product.Stock = productDto.Stock.Value;
+            if (productDto.Category.HasValue) product.Category = productDto.Category.Value;
+            if (productDto.SubCategory.HasValue) product.SubCategory = productDto.SubCategory.Value;
+            if (productDto.Status.HasValue) product.Status = productDto.Status.Value;
 
-            if (!ModelState.IsValid)
+
+            // Procesar la nueva imagen si se proporciona
+            if (image != null)
             {
-                return BadRequest(ModelState);
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(image.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await image.CopyToAsync(fileStream);
+                }
+
+                product.ImageUrl = $"/images/{uniqueFileName}";
             }
 
-            var success = await _productService.UpdateProduct(id, product, userId);
-            if (success == null || !success.Value)
+            var updatedProduct = await _productService.UpdateProduct(id, product, userId);
+            if (updatedProduct == null)
             {
                 return NotFound();
             }
 
-
             return Ok(product);
         }
+
 
 
         [Authorize(Policy = "AdminOrPremium")]

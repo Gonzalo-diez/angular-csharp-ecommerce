@@ -43,7 +43,7 @@ export class ProductAddComponent {
     // Detectar cambios en la categoría y actualizar subcategorías
     this.productForm.get('category')?.valueChanges.subscribe((category) => {
       this.subcategories = this.subcategoriesMap[category] || [];
-      this.productForm.patchValue({ subCategory: '' }); // Reset subcategoría
+      this.productForm.patchValue({ subCategory: '' });
     });
   }
 
@@ -66,9 +66,7 @@ export class ProductAddComponent {
         imageUrl: formValue.image
       };
   
-      const image = formValue.image; // Esto ya tiene el archivo seleccionado
-  
-      console.log('Enviando producto:', product);
+      const image = formValue.image;
   
       this.productService.addProduct(product, image).subscribe(
         (response) => {

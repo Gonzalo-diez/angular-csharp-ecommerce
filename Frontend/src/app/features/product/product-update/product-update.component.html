@@ -1,1 +1,66 @@
-<p>product-update works!</p>
+<div class="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Actualizar Producto</h2>
+  
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <!-- Nombre -->
+      <div>
+        <label class="block text-gray-700">Nombre:</label>
+        <input type="text" formControlName="name" class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300">
+      </div>
+  
+      <!-- Marca -->
+      <div>
+        <label class="block text-gray-700">Marca:</label>
+        <input type="text" formControlName="brand" class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300">
+      </div>
+  
+      <!-- Precio y Stock -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-gray-700">Precio:</label>
+          <input type="number" formControlName="price" class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300">
+        </div>
+        <div>
+          <label class="block text-gray-700">Stock:</label>
+          <input type="number" formControlName="stock" class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300">
+        </div>
+      </div>
+  
+      <!-- Categoría -->
+      <div>
+        <label class="block text-gray-700">Categoría:</label>
+        <select formControlName="category" class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300">
+          <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+        </select>
+      </div>
+  
+      <!-- Subcategoría -->
+      <div>
+        <label class="block text-gray-700">Subcategoría:</label>
+        <select formControlName="subCategory" class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300">
+          <option *ngFor="let subCategory of subCategories" [value]="subCategory">{{ subCategory }}</option>
+        </select>
+      </div>
+  
+      <!-- Estado -->
+      <div>
+        <label class="block text-gray-700">Estado:</label>
+        <select formControlName="status" class="w-full p-2 border rounded-lg focus:ring focus:ring-blue-300">
+          <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+        </select>
+      </div>
+  
+      <!-- Imagen -->
+      <div>
+        <label class="block text-gray-700">Imagen:</label>
+        <input type="file" (change)="onFileSelected($event)" class="w-full p-2 border rounded-lg">
+      </div>
+  
+      <!-- Botón -->
+      <button type="submit" [disabled]="productForm.invalid"
+        class="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition">
+        Actualizar
+      </button>
+    </form>
+  </div>
+  
