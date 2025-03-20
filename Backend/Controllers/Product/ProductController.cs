@@ -122,7 +122,6 @@ namespace Backend.Controllers
             return CreatedAtAction(nameof(GetProductById), new { id = newProduct.Id }, newProduct);
         }
 
-
         [Authorize(Policy = IdentityRoles.Premium)]
         [HttpPut("{id}")]
         public async Task<ActionResult<Product>> UpdateProduct(
@@ -187,8 +186,6 @@ namespace Backend.Controllers
 
             return Ok(product);
         }
-
-
 
         [Authorize(Policy = "AdminOrPremium")]
         [HttpDelete("{id}")]
