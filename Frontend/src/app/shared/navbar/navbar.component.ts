@@ -6,10 +6,14 @@ import { AuthService } from '../../core/services/auth/auth.service';
   selector: 'app-navbar',
   imports: [NgClass, NgIf],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css',
+  styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit {
   isSidebarOpen = false;
+  isCategoriesOpen = false;
+  isTechOpen = false;
+  isClothingOpen = false;
+  isHomeOpen = false;
   isAuth = false;
 
   constructor(private authService: AuthService) {}
@@ -17,11 +21,21 @@ export class NavbarComponent implements OnInit {
   ngOnInit(): void {
     this.authService.isAuthenticated().subscribe((authStatus) => {
       this.isAuth = authStatus;
-    })
+    });
   }
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
+  }
+  
+  toggleCategories() {
+    this.isCategoriesOpen = !this.isCategoriesOpen;
+  }
+  
+  toggleSubcategory(category: string) {
+    if (category === 'tech') this.isTechOpen = !this.isTechOpen;
+    if (category === 'clothing') this.isClothingOpen = !this.isClothingOpen;
+    if (category === 'home') this.isHomeOpen = !this.isHomeOpen;
   }
 
   isAuthenticated() {
@@ -33,6 +47,6 @@ export class NavbarComponent implements OnInit {
   }
 
   logout() {
-    this.authService.logout()
+    this.authService.logout();
   }
 }

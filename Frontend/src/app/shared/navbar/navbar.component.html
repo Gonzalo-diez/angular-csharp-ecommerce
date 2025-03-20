@@ -1,15 +1,84 @@
 <!-- Navbar -->
-<nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
+<nav
+  class="bg-gray-900 text-white p-4 flex justify-between items-center relative"
+>
   <!-- Logo -->
   <div class="text-2xl font-bold">Fakecommerce</div>
-
+  <!-- Desktop Menu -->
   <!-- Desktop Menu -->
   <ul class="hidden md:flex space-x-6">
     <li><a href="#" class="hover:text-gray-400">Home</a></li>
-    <li><a href="#" class="hover:text-gray-400">Category</a></li>
+
+    <!-- Dropdown Categorías -->
+    <li class="relative group">
+      <a href="#" class="hover:text-gray-400 flex items-center">Category ▼</a>
+      <ul
+        class="absolute left-0 mt-2 w-48 bg-gray-800 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      >
+        <!-- Technology -->
+        <li class="group/tech">
+          <a href="/product/category/Technology" class="block px-4 py-2 hover:bg-gray-700">Technology</a>
+          <ul
+            class="absolute left-full top-0 w-40 bg-gray-800 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 invisible group-hover/tech:visible"
+          >
+            <li>
+              <a href="/product/category/Technology/subcategory/Console" class="block px-4 py-2 hover:bg-gray-700">Consoles</a>
+            </li>
+            <li>
+              <a href="/product/category/Technology/subcategory/PC" class="block px-4 py-2 hover:bg-gray-700">Computers</a>
+            </li>
+            <li>
+              <a href="/product/category/Technology/subcategory/Smartphone" class="block px-4 py-2 hover:bg-gray-700"
+                >Smartphone</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <!-- Clothing -->
+        <li class="group/cloth">
+          <a href="/product/category/Clothing" class="block px-4 py-2 hover:bg-gray-700">Clothing</a>
+          <ul
+            class="absolute left-full top-10 w-40 bg-gray-800 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 invisible group-hover/cloth:visible"
+          >
+            <li>
+              <a href="/product/category/Clothing/subcategory/Men" class="block px-4 py-2 hover:bg-gray-700">Men</a>
+            </li>
+            <li>
+              <a href="/product/category/Clothing/subcategory/Women" class="block px-4 py-2 hover:bg-gray-700">Women</a>
+            </li>
+            <li>
+              <a href="/product/category/Clothing/subcategory/Kids" class="block px-4 py-2 hover:bg-gray-700">Kids</a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Home -->
+        <li class="group/home">
+          <a href="/product/category/Home" class="block px-4 py-2 hover:bg-gray-700">Home</a>
+          <ul
+            class="absolute left-full top-20 w-40 bg-gray-800 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 invisible group-hover/home:visible"
+          >
+            <li>
+              <a href="/product/category/Home/subcategory/Furniture" class="block px-4 py-2 hover:bg-gray-700"
+                >Furniture</a
+              >
+            </li>
+            <li>
+              <a href="/product/category/Home/subcategory/Kitchen" class="block px-4 py-2 hover:bg-gray-700">Kitchen</a>
+            </li>
+            <li>
+              <a href="/product/category/Home/subcategory/Decor" class="block px-4 py-2 hover:bg-gray-700">Decor</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+
     <li><a href="#" class="hover:text-gray-400">Contact</a></li>
   </ul>
 
+  <!-- Botones de Login/Logout -->
   <div>
     <button
       *ngIf="!isAuth"
@@ -58,15 +127,77 @@
   <!-- Enlaces del menú -->
   <ul class="space-y-4">
     <li><a href="#" class="block hover:text-gray-400">Home</a></li>
-    <li><a href="#" class="block hover:text-gray-400">Category</a></li>
+
+    <!-- Dropdown en Sidebar -->
+    <li>
+      <button
+        class="w-full text-left hover:text-gray-400"
+        (click)="toggleCategories()"
+      >
+        Category ▼
+      </button>
+      <ul *ngIf="isCategoriesOpen" class="ml-4 space-y-2">
+        <li>
+          <button
+            class="w-full text-left hover:text-gray-400"
+            (click)="toggleSubcategory('tech')"
+          >
+            Technology ▼
+          </button>
+          <ul *ngIf="isTechOpen" class="ml-4 space-y-2">
+            <li><a href="#" class="block hover:text-gray-400">Phones</a></li>
+            <li><a href="#" class="block hover:text-gray-400">Laptops</a></li>
+            <li>
+              <a href="#" class="block hover:text-gray-400">Accessories</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <button
+            class="w-full text-left hover:text-gray-400"
+            (click)="toggleSubcategory('clothing')"
+          >
+            Clothing ▼
+          </button>
+          <ul *ngIf="isClothingOpen" class="ml-4 space-y-2">
+            <li><a href="#" class="block hover:text-gray-400">Men</a></li>
+            <li><a href="#" class="block hover:text-gray-400">Women</a></li>
+            <li><a href="#" class="block hover:text-gray-400">Kids</a></li>
+          </ul>
+        </li>
+        <li>
+          <button
+            class="w-full text-left hover:text-gray-400"
+            (click)="toggleSubcategory('home')"
+          >
+            Home ▼
+          </button>
+          <ul *ngIf="isHomeOpen" class="ml-4 space-y-2">
+            <li><a href="#" class="block hover:text-gray-400">Furniture</a></li>
+            <li><a href="#" class="block hover:text-gray-400">Kitchen</a></li>
+            <li><a href="#" class="block hover:text-gray-400">Decor</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+
     <li><a href="#" class="block hover:text-gray-400">Contact</a></li>
   </ul>
 
+  <!-- Botones de Login/Logout -->
   <div class="mt-6">
-    <button *ngIf="!isAuth" (click)="login()" class="bg-blue-500 w-full px-4 py-2 rounded hover:bg-blue-700">
+    <button
+      *ngIf="!isAuth"
+      (click)="login()"
+      class="bg-blue-500 w-full px-4 py-2 rounded hover:bg-blue-700"
+    >
       Login
     </button>
-    <button *ngIf="isAuth" (click)="logout()" class="bg-red-500 w-full px-4 py-2 rounded hover:bg-red-700">
+    <button
+      *ngIf="isAuth"
+      (click)="logout()"
+      class="bg-red-500 w-full px-4 py-2 rounded hover:bg-red-700"
+    >
       Logout
     </button>
   </div>
