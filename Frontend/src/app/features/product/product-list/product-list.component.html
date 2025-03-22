@@ -1,1 +1,57 @@
-<app-product-shared [products]="products" />
+<div class="container mx-auto p-4">
+  <div class="flex flex-col md:flex-row gap-6 items-start">
+    <!-- Filtros (izquierda) -->
+    <aside
+      class="filters bg-white shadow-md rounded-lg p-4 w-full md:w-1/4 flex flex-col gap-4 self-start"
+    >
+      <h2 class="text-lg font-semibold mb-2">Filters</h2>
+
+      <input
+        type="number"
+        [(ngModel)]="minPrice"
+        placeholder="Min Price"
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+
+      <input
+        type="number"
+        [(ngModel)]="maxPrice"
+        placeholder="Max Price"
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+
+      <select
+        [(ngModel)]="productCategory"
+        (ngModelChange)="updateSubcategories()"
+        class="w-full px-4 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option [ngValue]="undefined">All Categories</option>
+        <option *ngFor="let cat of productCategories" [ngValue]="cat">
+          {{ cat }}
+        </option>
+      </select>
+
+      <select
+        [(ngModel)]="productSubCategory"
+        class="w-full px-4 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option [ngValue]="undefined">All Subcategories</option>
+        <option *ngFor="let sub of productSubCategories" [ngValue]="sub">
+          {{ sub }}
+        </option>
+      </select>
+
+      <button
+        (click)="filterProducts()"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md transition duration-300"
+      >
+        Filter
+      </button>
+    </aside>
+
+    <!-- Lista de productos (derecha) -->
+    <div class="w-full md:w-3/4">
+      <app-product-shared [products]="filteredProducts"></app-product-shared>
+    </div>
+  </div>
+</div>

@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core';
 import { ProductModel } from '../../../core/models/product/product.model';
-import { NgFor, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-product-shared',
-  imports: [NgIf, NgFor],
+  imports: [CommonModule],
   templateUrl: './product-shared.component.html',
   styleUrl: './product-shared.component.css'
 })

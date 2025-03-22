@@ -7,6 +7,8 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ProductModel } from '../../models/product/product.model';
+import { ProductCategory } from '../../models/product/product-category';
+import { ProductSubCategory } from '../../models/product/product-sub-category';
 
 @Injectable({
   providedIn: 'root',
@@ -20,8 +22,8 @@ export class ProductService {
   getAllProducts(
     minPrice?: number,
     maxPrice?: number,
-    category?: string,
-    subCategory?: string
+    category?: ProductCategory,
+    subCategory?: ProductSubCategory
   ): Observable<ProductModel[]> {
     let params: any = {};
     if (minPrice !== undefined) params.minPrice = minPrice;
