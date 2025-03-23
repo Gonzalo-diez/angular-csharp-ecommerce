@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { ProductModel } from '../../../core/models/product/product.model';
 import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ProductModel } from '../../../core/models/product/product.model';
 import { ProductService } from '../../../core/services/product/product.service';
-import { ProductSharedComponent } from "../product-shared/product-shared.component";
+import { ProductSharedComponent } from '../product-shared/product-shared.component';
+import { ProductCategory } from '../../../core/models/product/product-category';
 
 @Component({
   selector: 'app-product-subcategory',
-  imports: [ProductSharedComponent],
+  imports: [ProductSharedComponent, CommonModule, FormsModule],
   templateUrl: './product-subcategory.component.html',
   styleUrl: './product-subcategory.component.css',
 })
@@ -14,6 +17,10 @@ export class ProductSubcategoryComponent implements OnInit {
   category: string | null = null;
   subcategory: string | null = null;
   subcategoryProducts: ProductModel[] = [];
+  filteredProducts: ProductModel[] = [];
+
+  minPrice?: number;
+  maxPrice?: number;
 
   constructor(
     private route: ActivatedRoute,
@@ -37,11 +44,23 @@ export class ProductSubcategoryComponent implements OnInit {
         next: (data) => {
           this.subcategoryProducts = data.map((product) => ({
             ...product,
+            category: Object.values(ProductCategory)[Number(product.category)] as ProductCategory,
           }));
+
+          this.filteredProducts = [...this.subcategoryProducts];
         },
         error: (err) => {
           console.error('Error to obtain products in subcategory:', err);
         },
       });
+  }
+  
+  filterProducts(): void {
+    this.filteredProducts = this.subcategoryProducts.filter((product) => {
+      return (
+        (!this.minPrice || product.price >= this.minPrice) &&
+        (!this.maxPrice || product.price <= this.maxPrice)
+      );
+    });
   }
 }
