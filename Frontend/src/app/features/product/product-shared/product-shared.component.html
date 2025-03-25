@@ -5,13 +5,14 @@
   </div>
 
   <!-- Lista de productos -->
-  <div
+  <ol
     *ngIf="products.length > 0"
     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
   >
-    <div
+    <li
       *ngFor="let product of products"
       class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition"
+      [routerLink]="['/product', product.id]"
     >
       <img
         *ngIf="product.imageUrl"
@@ -28,6 +29,6 @@
       <p class="text-gray-500 text-sm">
         <strong>Category:</strong> {{ product.category }}
       </p>
-    </div>
-  </div>
+    </li>
+  </ol>
 </div>

@@ -1,35 +1,37 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ProductService } from '../../../core/services/product/product.service';
 import { ProductModel } from '../../../core/models/product/product.model';
-import { NgClass, isPlatformBrowser } from '@angular/common';
+import { AuthService } from '../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-product-item',
   templateUrl: './product-item.component.html',
-  imports: [NgClass],
+  imports: [CommonModule],
   standalone: true,
   styleUrls: ['./product-item.component.css']
 })
 export class ProductItemComponent implements OnInit {
   product: ProductModel | null = null;
   productId!: number;
+  isAuth = false;
   userId?: number;
 
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
-    @Inject(PLATFORM_ID) private platformId: any // Inyección para detectar si es navegador o SSR
+    private authService: AuthService,
+    @Inject(PLATFORM_ID) private platformId: any
   ) {}
 
   ngOnInit(): void {
     // Obtener el ID del producto desde la URL
     this.productId = Number(this.route.snapshot.paramMap.get('id'));
 
-    // Verificar si estamos en el navegador antes de acceder a localStorage
-    if (isPlatformBrowser(this.platformId)) {
-      this.userId = Number(localStorage.getItem('userId')) || undefined;
-    }
+    this.authService.isAuthenticated().subscribe((authStatus) => {
+      this.isAuth = authStatus;
+    })
 
     // Cargar el producto
     if (this.productId) {
@@ -44,5 +46,9 @@ export class ProductItemComponent implements OnInit {
       },
       error: (err) => console.error('Error loading product:', err)
     });
+  }
+
+  isAuthenticated() {
+    this.authService.isAuthenticated();
   }
 }
