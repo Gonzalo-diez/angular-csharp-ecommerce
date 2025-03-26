@@ -36,7 +36,7 @@ namespace Backend.Controllers
             _pdfService = pdfService;
         }
 
-        [HttpGet("")]
+        [HttpGet]
         public async Task<IActionResult> GetCart([FromQuery] int? userId)
         {
             try

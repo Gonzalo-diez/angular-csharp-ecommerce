@@ -21,9 +21,9 @@ export class CartService {
     });
   }
 
-  // ✅ Agregar producto al carrito (usando `CartItemModel`)
-  addToCart(userId: number, cartItem: CartItemModel): Observable<CartModel> {
-    return this.http.post<CartModel>(`${this.apiUrl}/add`, cartItem, { 
+  // ✅ Agregar producto al carrito
+  addToCart(userId: number, productId: number, quantity: number): Observable<CartModel> {
+    return this.http.post<CartModel>(`${this.apiUrl}/add`, { productId, quantity }, { 
       params: new HttpParams().set('userId', userId) 
     });
   }

@@ -42,6 +42,10 @@ export class NavbarComponent implements OnInit {
     this.authService.isAuthenticated();
   }
 
+  cart() {
+    window.location.href = '/cart';
+  }
+
   login() {
     window.location.href = '/auth/login';
   }

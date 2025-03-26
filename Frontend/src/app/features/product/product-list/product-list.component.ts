@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../../core/services/product/product.service';
 import { ProductModel } from '../../../core/models/product/product.model';
 import { ProductCategory } from '../../../core/models/product/product-category';
 import { ProductSubCategory } from '../../../core/models/product/product-sub-category';
 import { ProductSharedComponent } from '../product-shared/product-shared.component';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-product-list',

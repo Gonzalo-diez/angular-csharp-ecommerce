@@ -18,7 +18,7 @@
           class="px-3 py-1 text-xs font-semibold rounded-full"
           *ngIf="product?.stock !== undefined"
         >
-          {{ "Stock: " + product?.stock  }}
+          {{ "Stock: " + product?.stock }}
         </span>
       </div>
       <div class="mt-6 flex gap-4">
@@ -26,6 +26,7 @@
           class="w-full px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"
           [disabled]="product?.stock === 0"
           *ngIf="isAuth"
+          (click)="addProductToCart()"
         >
           Añadir al carrito
         </button>

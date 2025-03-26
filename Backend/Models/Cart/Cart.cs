@@ -25,7 +25,7 @@ namespace Backend.Models
         public Cart(Auth user)
         {
             User = user;
-            UserId = user.Id; // Asegura que UserId también se establezca
+            UserId = user.Id;
             Items = new List<CartItem>();
         }
     }

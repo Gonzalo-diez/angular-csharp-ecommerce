@@ -1,1 +1,63 @@
-<p>cart works!</p>
+<div class="container mx-auto px-4 py-8">
+  <h2 class="text-2xl font-semibold text-center mb-6">Carrito de Compras</h2>
+
+  <!-- Error Message -->
+  <div
+    *ngIf="errorMessage"
+    class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4"
+  >
+    {{ errorMessage }}
+  </div>
+
+  <!-- Cart Content -->
+  <div *ngIf="cart && cart.items.length > 0; else emptyCart">
+    <div class="bg-white shadow-lg rounded-lg p-6">
+      <ul>
+        <li
+          *ngFor="let item of cart.items"
+          class="flex items-center justify-between border-b py-3"
+        >
+          <div class="flex items-center gap-4">
+            <div>
+              <p class="text-lg font-medium">{{ item.product.name }}</p>
+              <p class="text-sm text-gray-500">Cantidad: {{ item.quantity }}</p>
+              <p class="text-sm text-gray-500">
+                Precio: ${{ item.product.price }}
+              </p>
+            </div>
+          </div>
+          <button
+            (click)="removeItem(item)"
+            class="text-red-500 hover:text-red-700"
+          >
+            ✖
+          </button>
+        </li>
+      </ul>
+      <div class="flex justify-between items-center mt-4">
+        <p class="text-lg font-semibold">Total: ${{ getTotal() }}</p>
+        <div class="flex gap-3">
+          <button
+            (click)="clearCart()"
+            class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+          >
+            Vaciar carrito
+          </button>
+          <button
+            (click)="checkout()"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Finalizar compra
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty Cart Message -->
+  <ng-template #emptyCart>
+    <div class="text-center">
+      <p class="text-gray-500 text-lg">Tu carrito está vacío.</p>
+    </div>
+  </ng-template>
+</div>
