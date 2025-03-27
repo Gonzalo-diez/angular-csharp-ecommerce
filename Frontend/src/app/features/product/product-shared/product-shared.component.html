@@ -29,6 +29,13 @@
       <p class="text-gray-500 text-sm">
         <strong>Category:</strong> {{ product.category }}
       </p>
+
+      <button
+        *ngIf="userId === product.ownerId || userRole === 'admin'"
+        (click)="deleteProduct(product.id!, userId!)"
+      >
+        🗑️ Eliminar
+      </button>
     </li>
   </ol>
 </div>
