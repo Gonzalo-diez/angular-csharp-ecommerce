@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../core/services/cart/cart.service';
+import { SignalService } from '../../core/services/signal/signal.service';
 import { CartModel } from '../../core/models/cart/cart.model';
 import { CartItemModel } from '../../core/models/cart/cart-item.model';
 import { AuthService } from '../../core/services/auth/auth.service';
-import { InvoiceModel } from '../../core/models/invoice/invoice.model';
 
 @Component({
   selector: 'app-cart',
@@ -14,16 +14,32 @@ import { InvoiceModel } from '../../core/models/invoice/invoice.model';
   styleUrls: ['./cart.component.css'],
 })
 export class CartComponent implements OnInit {
-  cart: CartModel | null = null;
+  cart: CartModel = {
+    id: 0,
+    userId: 0,
+    items: [], // 👈 Inicializar como array vacío
+    createdAt: '',
+  };
   userId: number | null = null;
   errorMessage: string = '';
 
   constructor(
     private cartService: CartService,
-    private authService: AuthService
+    private authService: AuthService,
+    private signalService: SignalService
   ) {}
 
   ngOnInit(): void {
+    this.signalService.startConnection();
+
+    // Suscribirse a cambios en el carrito desde SignalR
+    this.signalService.cartUpdates$.subscribe((cart) => {
+      if (cart) {
+        console.log('🛒 Carrito actualizado en tiempo real:', cart);
+        this.cart = cart;
+      }
+    });
+
     this.authService.isAuthenticated().subscribe((isAuth) => {
       if (isAuth) {
         const token = this.authService.getToken();
@@ -43,7 +59,7 @@ export class CartComponent implements OnInit {
       next: (cartData) => {
         this.cart = cartData;
       },
-      error: (err) => {
+      error: () => {
         this.errorMessage = 'Error al cargar el carrito.';
       },
     });
@@ -56,9 +72,11 @@ export class CartComponent implements OnInit {
         this.cart = updatedCart ?? {
           id: 0,
           userId: this.userId,
-          items: [],
+          items: [], // Asegurar que siempre haya un array
           createdAt: '',
         };
+
+        this.signalService.sendUpdate(Number(this.userId), this.cart);
       },
       error: () => {
         this.errorMessage = 'Error al vaciar el carrito.';
@@ -73,9 +91,11 @@ export class CartComponent implements OnInit {
         this.cart = updatedCart ?? {
           id: 0,
           userId: this.userId,
-          items: [],
+          items: [], // Asegurar que siempre haya un array
           createdAt: '',
         };
+
+        this.signalService.sendUpdate(Number(this.userId), this.cart);
       },
       error: () => {
         this.errorMessage = 'Error al eliminar el producto.';
@@ -96,13 +116,19 @@ export class CartComponent implements OnInit {
     this.cartService.checkout(this.userId, this.cart).subscribe({
       next: (invoice) => {
         console.log('Compra realizada:', invoice);
-        this.cart = null;
+  
+        // En lugar de null, asignamos un carrito vacío
+        this.cart = { id: 0, userId: Number(this.userId), items: [], createdAt: '' };
+  
+        // Notificar que el carrito ha sido limpiado
+        this.signalService.sendUpdate(Number(this.userId), this.cart);
       },
       error: () => {
         this.errorMessage = 'Error en el proceso de compra.';
       },
     });
   }
+  
 
   private decodeToken(token: string): number | null {
     try {
@@ -114,7 +140,6 @@ export class CartComponent implements OnInit {
 
       const payload = JSON.parse(atob(base64Url));
 
-      // Extraer userId correctamente
       if (payload.user) {
         const userObject = JSON.parse(payload.user);
         return userObject.Id || null;

@@ -10,7 +10,7 @@
   </div>
 
   <!-- Cart Content -->
-  <div *ngIf="cart && cart.items.length > 0; else emptyCart">
+  <div *ngIf="(cart?.items?.length || 0) > 0; else emptyCart">
     <div class="bg-white shadow-lg rounded-lg p-6">
       <ul>
         <li

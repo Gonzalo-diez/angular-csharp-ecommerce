@@ -1,15 +1,19 @@
 using Backend.Interfaces;
 using Backend.Models;
+using Backend.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 public class CartService : ICartService
 {
     private readonly ICartRepository _cartRepository;
     private readonly IProductRepository _productRepository;
+    private readonly IHubContext<CartHub> _cartHub;
 
-    public CartService(ICartRepository cartRepository, IProductRepository productRepository)
+    public CartService(ICartRepository cartRepository, IProductRepository productRepository, IHubContext<CartHub> cartHub)
     {
         _cartRepository = cartRepository ?? throw new ArgumentNullException(nameof(cartRepository));
         _productRepository = productRepository ?? throw new ArgumentNullException(nameof(productRepository));
+        _cartHub = cartHub;
     }
 
     // Obtener el carrito de un usuario por su UserId
@@ -95,10 +99,19 @@ public class CartService : ICartService
         {
             cart.Items.Remove(cartItem);
             await _cartRepository.UpdateAsync(cart);
+
+            if (userId == null)
+            {
+                throw new ArgumentNullException(nameof(userId), "UserId cant be null");
+            }
+
+            // 🔹 Notificar a los clientes sobre la actualización del carrito
+            await _cartHub.Clients.User(userId.Value.ToString()).SendAsync("CartUpdated", cart);
         }
 
         return cart;
     }
+
 
     // Vaciar el carrito completamente
     public async Task<Cart?> ClearCartAsync(int? userId)
@@ -111,6 +124,16 @@ public class CartService : ICartService
 
         cart.Items.Clear();
         await _cartRepository.UpdateAsync(cart);
+
+        if (userId == null)
+        {
+            throw new ArgumentNullException(nameof(userId), "UserId cant be null");
+        }
+
+        // 🔹 Notificar a los clientes que el carrito ha sido vaciado
+        await _cartHub.Clients.User(userId.Value.ToString()).SendAsync("CartCleared");
+
         return cart;
     }
+
 }

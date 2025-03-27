@@ -41,20 +41,18 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy(IdentityRoles.Premium, policy => policy.RequireRole(IdentityRoles.Premium));
     options.AddPolicy("AdminOrPremium", policy => policy.RequireRole(IdentityRoles.Admin, IdentityRoles.Premium));
 });
+
+var jwtKey = configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key no está configurada.");
+
 builder.Services
-    .AddAuthentication(x =>
-    {
-        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.RequireHttpsMetadata = false;
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
             ValidateIssuer = false,
             ValidateAudience = false,
             ValidateLifetime = true,
@@ -75,13 +73,13 @@ builder.Services
         };
     });
 
-// ✅ Habilitar CORS (si tienes frontend separado)
+// ✅ Habilitar CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy",
-        builder => builder.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
+    options.AddPolicy("CorsPolicy", builder =>
+        builder.WithOrigins("http://localhost:4200")
+               .AllowAnyMethod()
+               .AllowAnyHeader());
 });
 
 // 📌 **Registrar los servicios y repositorios**
@@ -104,15 +102,22 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
-
 builder.Services.AddScoped<IPaymentService, PaymentService>();
-
 builder.Services.AddScoped<IPdfService, PdfService>();
-
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 // ✅ Agregar controladores y Swagger
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+    })
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -125,21 +130,11 @@ builder.Services.AddSwaggerGen(options =>
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllers().AddNewtonsoftJson();
-builder.Services.AddControllers()
-        .AddNewtonsoftJson(options =>
-        {
-            options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-        });
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-});
 
+builder.Services.AddHttpContextAccessor();
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -154,8 +149,9 @@ app.UseExceptionHandler(errorApp =>
         var error = context.Features.Get<IExceptionHandlerFeature>();
         if (error != null)
         {
+            var errorResponse = new { error = error.Error.Message };
             Console.WriteLine($"❌ ERROR: {error.Error.Message}");
-            await context.Response.WriteAsync($"{{\"error\": \"{error.Error.Message}\"}}");
+            await context.Response.WriteAsJsonAsync(errorResponse);
         }
     });
 });
@@ -173,7 +169,10 @@ app.UseStaticFiles();
 app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHub<Backend.Hubs.CartHub>("/cartHub");
 app.MapControllers();
+
+// ✅ Middleware para imprimir el token recibido (solo para depuración)
 app.Use(async (context, next) =>
 {
     var token = context.Request.Headers["Authorization"];
