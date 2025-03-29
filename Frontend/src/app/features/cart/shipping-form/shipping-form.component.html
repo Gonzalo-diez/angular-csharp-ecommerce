@@ -1,0 +1,58 @@
+<div class="bg-white p-6 rounded-lg shadow-md w-full max-w-lg mx-auto mt-8">
+  <h3 class="text-lg font-semibold mb-4 text-center">Datos de Envío</h3>
+
+  <form [formGroup]="shippingForm" (ngSubmit)="submitForm()" class="space-y-4">
+    <div>
+      <label class="block text-gray-700">Nombre Completo</label>
+      <input
+        type="text"
+        formControlName="fullName"
+        class="w-full px-3 py-2 border rounded"
+        placeholder="Tu nombre completo"
+      />
+    </div>
+    <div>
+      <label class="block text-gray-700">Dirección</label>
+      <input
+        type="text"
+        formControlName="address"
+        class="w-full px-3 py-2 border rounded"
+        placeholder="Calle y número"
+      />
+    </div>
+    <div>
+      <label class="block text-gray-700">Ciudad</label>
+      <input
+        type="text"
+        formControlName="city"
+        class="w-full px-3 py-2 border rounded"
+        placeholder="Ciudad"
+      />
+    </div>
+    <div>
+      <label class="block text-gray-700">Código Postal</label>
+      <input
+        type="text"
+        formControlName="zipCode"
+        class="w-full px-3 py-2 border rounded"
+        placeholder="12345"
+      />
+    </div>
+    <div>
+      <label class="block text-gray-700">Teléfono</label>
+      <input
+        type="text"
+        formControlName="phone"
+        class="w-full px-3 py-2 border rounded"
+        placeholder="Tu teléfono"
+      />
+    </div>
+    <button
+      type="submit"
+      class="bg-blue-500 text-white px-4 py-2 rounded w-full"
+      [disabled]="!shippingForm.valid"
+    >
+      Confirmar Envío
+    </button>
+  </form>
+</div>

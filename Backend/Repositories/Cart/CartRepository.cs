@@ -12,19 +12,15 @@ public class CartRepository : ICartRepository
     }
 
     // Obtener el carrito de un usuario por su UserId
-    public async Task<Cart?> GetCartByUserIdAsync(int? userId)
+    public async Task<Cart> GetCartByUserIdAsync(int? userId)
     {
-        if (userId.HasValue)
-        {
-            return await _context.Carts
-                .Include(c => c.Items)
-                .ThenInclude(ci => ci.Product)
-                .FirstOrDefaultAsync(c => c.UserId == userId);
-        }
+        var cart = await _context.Carts
+            .Include(c => c.Items)
+            .ThenInclude(ci => ci.Product)
+            .FirstOrDefaultAsync(c => c.UserId == userId);
 
-        return null;
+        return cart ?? throw new Exception($"No se encontró un carrito para el usuario con ID {userId}.");
     }
-
 
     public async Task CreateAsync(Cart cart)
     {
@@ -49,11 +45,16 @@ public class CartRepository : ICartRepository
     // Eliminar un carrito por UserId (opcional)
     public async Task DeleteByUserIdAsync(int? userId)
     {
-        var cart = await _context.Carts.FirstOrDefaultAsync(c => userId != null && c.UserId == userId);
-        if (cart != null)
-        {
-            _context.Carts.Remove(cart);
-            await _context.SaveChangesAsync();
-        }
+        var cart = await _context.Carts.Include(c => c.Items)
+            .FirstOrDefaultAsync(c => userId != null && c.UserId == userId);
+
+        if (cart == null) return;
+
+        if (cart.Items.Any())
+            throw new Exception("No se puede eliminar un carrito con productos dentro.");
+
+        _context.Carts.Remove(cart);
+        await _context.SaveChangesAsync();
     }
+
 }

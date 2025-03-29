@@ -33,20 +33,32 @@ namespace Backend.Repositories
         public IQueryable<Purchase> GetPurchases(int? userId)
         {
             return _context.Purchases
-                        .Where(p => userId != null && p.UserId == userId);
+                .Where(p => !userId.HasValue || p.UserId == userId);
         }
 
         public async Task<IEnumerable<Purchase>> GetByUserIdAsync(int? userId)
         {
-            return await _context.Purchases.Include(p => p.UserId == userId)
+            return await _context.Purchases
+                .Where(p => p.UserId == userId)
+                .Include(p => p.User)
                 .Include(p => p.Product)
                 .ToListAsync();
         }
 
         public async Task<Purchase> CreateAsync(Purchase purchase)
         {
+            var user = await _context.Users.FindAsync(purchase.UserId);
+            if (user == null) throw new Exception("El usuario no existe.");
+
+            var product = await _context.Products.FindAsync(purchase.ProductId);
+            if (product == null) throw new Exception("El producto no existe.");
+
+            if (product.Stock < purchase.Quantity)
+                throw new Exception($"Stock insuficiente para {product.Name}. Disponible: {product.Stock}");
+
             _context.Purchases.Add(purchase);
             await _context.SaveChangesAsync();
+
             return purchase;
         }
 

@@ -77,7 +77,7 @@ export class ProductItemComponent implements OnInit {
       ); // Debug
 
       this.cartService
-        .addToCart(this.userId, Number(this.product.id), this.quantity)
+        .addProductToCart(this.userId, Number(this.product.id), this.quantity)
         .subscribe({
           next: (cart) => console.log('Producto agregado al carrito', cart),
           error: (err) =>
@@ -90,21 +90,21 @@ export class ProductItemComponent implements OnInit {
 
   private decodeToken(token: string): number | null {
     try {
-      const base64Url = token.split('.')[1];
-      if (!base64Url) {
-        console.error('Formato de token inválido');
-        return null;
-      }
+      const base64Url = token.split('.')[1]; // Extrae la parte del payload del JWT
+      if (!base64Url) return null;
 
-      const payload = JSON.parse(atob(base64Url));
+      const payload = JSON.parse(atob(base64Url)); // Decodifica el payload
+      console.log('Payload:', payload);
 
-      // Extraer userId correctamente
-      if (payload.user) {
-        const userObject = JSON.parse(payload.user);
-        return userObject.Id || null;
-      }
+      // Verifica si existe la propiedad "user" y conviértela en objeto
+      const userData = payload.user ? JSON.parse(payload.user) : null;
+      console.log('User Data:', userData);
 
-      return null;
+      // Extrae el ID si existe
+      const id = userData?.Id ?? null;
+      console.log('Id:', id);
+
+      return id;
     } catch (e) {
       console.error('Error al decodificar el token:', e);
       return null;

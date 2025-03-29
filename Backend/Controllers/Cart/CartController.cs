@@ -69,6 +69,11 @@ namespace Backend.Controllers
         {
             try
             {
+                if (userId == null)
+                {
+                    return BadRequest(new { message = "Se requiere un userId válido." });
+                }
+
                 // Obtener el carrito del usuario
                 var cart = await _cartService.GetCartByUserIdAsync(userId);
                 if (cart == null || !cart.Items.Any())
@@ -132,8 +137,6 @@ namespace Backend.Controllers
 
                 // Generar PDF
                 var pdfBytes = await _pdfService.GenerateInvoicePdfAsync(invoice);
-
-                // Retornar la factura en PDF antes de continuar con el pago
                 var pdfFile = File(pdfBytes, "application/pdf", $"factura{invoice.Id}.pdf");
 
                 // Si el método de pago es Stripe
@@ -143,6 +146,9 @@ namespace Backend.Controllers
                     if (!string.IsNullOrEmpty(paymentSessionUrl))
                     {
                         await _cartService.ClearCartAsync(userId);
+
+                        Console.WriteLine("Compra realizada con éxito para el usuario ID: " + userId);
+
                         return Ok(new { message = "Compra completada con éxito.", paymentUrl = paymentSessionUrl, pdfUrl = pdfFile });
                     }
                     else
@@ -159,6 +165,9 @@ namespace Backend.Controllers
                         if (!string.IsNullOrEmpty(paymentUrl))
                         {
                             await _cartService.ClearCartAsync(userId);
+
+                            Console.WriteLine("Compra realizada con éxito para el usuario ID: " + userId);
+
                             return Ok(new { message = "Compra completada con éxito.", paymentUrl, pdfUrl = pdfFile });
                         }
                         else
@@ -168,6 +177,7 @@ namespace Backend.Controllers
                     }
                     catch (Exception ex)
                     {
+                        Console.WriteLine("Error en Checkout (MercadoPago): " + ex.Message);
                         return BadRequest(new { message = "Error al crear la preferencia de MercadoPago.", error = ex.Message });
                     }
                 }
@@ -178,10 +188,10 @@ namespace Backend.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Error en Checkout: " + ex.Message);
                 return BadRequest(new { message = ex.Message });
             }
         }
-
 
         [HttpDelete("remove/{productId}")]
         public async Task<IActionResult> RemoveItem(int productId, [FromQuery] int? userId)

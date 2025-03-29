@@ -29,14 +29,14 @@ namespace Backend.Services
         }
 
         public async Task<Purchase> CreatePurchaseAsync(int? userId, Product product, int quantity)
-        {   
+        {
             var purchase = new Purchase
             {
                 UserId = userId,
                 ProductId = product.Id,
-                Product = product,
                 Quantity = quantity
             };
+
 
             return await _purchaseRepository.CreateAsync(purchase);
         }

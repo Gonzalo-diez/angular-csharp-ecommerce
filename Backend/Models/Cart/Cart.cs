@@ -8,25 +8,22 @@ namespace Backend.Models
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey("UserId")]
+        [ForeignKey("User")]
         public int? UserId { get; set; }
-
-        public Auth? User { get; set; } = null!;
-
+        public Auth? User { get; set; } 
 
         public List<CartItem> Items { get; set; } = new List<CartItem>();
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // ✅ Constructor sin parámetros necesario para EF Core
-        public Cart() { }
+        // Constructor sin parámetros necesario para EF Core
+        public Cart() {}
 
-        // ✅ Constructor asegurando que User y UserId siempre se inicialicen
+        // Constructor asegurando que el usuario y su ID se asignen correctamente
         public Cart(Auth user)
         {
             User = user;
             UserId = user.Id;
-            Items = new List<CartItem>();
         }
     }
 }

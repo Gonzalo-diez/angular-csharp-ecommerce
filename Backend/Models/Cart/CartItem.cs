@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.Models
 {
@@ -8,26 +7,24 @@ namespace Backend.Models
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey("CartId")]
         public int CartId { get; set; }
         public Cart Cart { get; set; } = null!;
 
-        [ForeignKey("ProductId")]
         public int ProductId { get; set; }
         public Product Product { get; set; } = null!;
 
         public int Quantity { get; set; } = 1;
 
-        // ✅ Constructor sin parámetros necesario para EF Core
-        public CartItem() { }
+        // Constructor sin parámetros para EF Core
+        public CartItem() {}
 
-        // ✅ Constructor asegurando que CartId y ProductId se inicialicen
+        // Constructor asegurando que Cart y Product se asignen correctamente
         public CartItem(Cart cart, Product product, int quantity = 1)
         {
             Cart = cart;
-            CartId = cart.Id; // Se asegura de establecer el ID del carrito
+            CartId = cart.Id;
             Product = product;
-            ProductId = product.Id; // Se asegura de establecer el ID del producto
+            ProductId = product.Id;
             Quantity = quantity;
         }
     }

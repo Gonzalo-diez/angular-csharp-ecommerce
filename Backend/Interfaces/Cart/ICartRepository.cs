@@ -3,8 +3,9 @@ using Backend.Models;
 public interface ICartRepository
 {
     // Obtener el carrito de un usuario por su UserId
-    Task<Cart?> GetCartByUserIdAsync(int? userId);
+    Task<Cart> GetCartByUserIdAsync(int? userId);
 
+    // Crear el carrito
     Task CreateAsync(Cart cart);
 
     // Agregar un nuevo carrito

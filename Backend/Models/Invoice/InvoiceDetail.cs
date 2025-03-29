@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.Models
 {
@@ -8,15 +7,25 @@ namespace Backend.Models
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey("invoiceId")]
         public int InvoiceId { get; set; }
         public Invoice Invoice { get; set; } = null!;
 
-        [ForeignKey("ProductId")]
         public int ProductId { get; set; }
         public Product Product { get; set; } = null!;
 
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
+
+        public InvoiceDetail() {}
+
+        public InvoiceDetail(Invoice invoice, Product product, int quantity, decimal unitPrice)
+        {
+            Invoice = invoice;
+            InvoiceId = invoice.Id;
+            Product = product;
+            ProductId = product.Id;
+            Quantity = quantity;
+            UnitPrice = unitPrice;
+        }
     }
 }

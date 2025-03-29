@@ -8,12 +8,11 @@ namespace Backend.Models
         [Key]
         public int Id { get; set; }
 
-        // Relación con el usuario que compró
-        [ForeignKey("UserId")]
+        [ForeignKey("User")]
         public int? UserId { get; set; }
-        public Auth? User { get; set; } = null!;
-        // Relación con el producto comprado
-        [ForeignKey("ProductId")]
+        public Auth? User { get; set; } 
+
+        [ForeignKey("Product")]
         public int ProductId { get; set; }
         public Product Product { get; set; } = null!;
 
@@ -22,10 +21,13 @@ namespace Backend.Models
 
         public Purchase() {}
 
-        public Purchase(Auth user, Product product)
+        public Purchase(Auth user, Product product, int quantity)
         {
             User = user;
+            UserId = user.Id;
             Product = product;
+            ProductId = product.Id;
+            Quantity = quantity;
         }
     }
 }
