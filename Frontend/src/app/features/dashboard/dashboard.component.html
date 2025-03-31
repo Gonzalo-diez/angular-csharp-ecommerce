@@ -1,1 +1,22 @@
-<p>dashboard works!</p>
+<div class="container mx-auto px-4 py-8">
+  <h2 class="text-3xl font-bold text-center mb-6">Dashboard</h2>
+
+  <!-- Tarjetas de estadísticas -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-blue-500 text-white p-6 rounded-lg shadow-lg text-center">
+      <h3 class="text-xl font-semibold">Total de Usuarios</h3>
+      <p class="text-2xl font-bold">{{ dashboardData?.totalUsers }}</p>
+    </div>
+
+    <div class="bg-green-500 text-white p-6 rounded-lg shadow-lg text-center">
+      <h3 class="text-xl font-semibold">Numero de Ventas</h3>
+      <p class="text-2xl font-bold">Cantidad: {{ dashboardData?.totalPurchases }}</p>
+      <p class="text-2xl font-bold">${{ dashboardData?.totalRevenue }}</p>
+    </div>
+
+    <div class="bg-yellow-500 text-white p-6 rounded-lg shadow-lg text-center">
+      <h3 class="text-xl font-semibold">Total de Productos</h3>
+      <p class="text-2xl font-bold">{{ dashboardData?.totalProducts }}</p>
+    </div>
+  </div>
+</div>

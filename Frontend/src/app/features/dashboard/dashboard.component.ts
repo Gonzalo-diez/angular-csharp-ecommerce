@@ -1,11 +1,42 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DashboardService } from '../../core/services/dashboard/dashboard.service';
+import { DashboardModel } from '../../core/models/dashboard/dashboard.model';
+import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  imports: [CommonModule],
+  standalone: true,
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
+  dashboardData: DashboardModel | null = null;
 
+  constructor(private dashboardService: DashboardService, private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.authService.isAuthenticated().subscribe((isAuth) => {
+      if (isAuth) {
+        const token = this.authService.getToken();
+
+        if (token) {
+          this.loadDashboard();
+        }
+      }
+    })
+  }
+
+  loadDashboard(): void {
+    this.dashboardService.getDashboardData().subscribe({
+      next: (data) => {
+        console.log('Dashboard data:', data);
+        this.dashboardData = data;
+      },
+      error: (error) => {
+        console.error('Error to obtain dashboard data:', error);
+      },
+    });
+  }
 }

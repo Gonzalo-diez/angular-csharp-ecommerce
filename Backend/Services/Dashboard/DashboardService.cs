@@ -18,6 +18,7 @@ namespace Backend.Services
             {
                 TotalUsers = await _repository.GetTotalUsers(),
                 TotalProducts = await _repository.GetTotalProducts(),
+                ProductsByCategory = await _repository.GetProductsByCategory(),
                 TotalPurchases = await _repository.GetTotalPurchases(),
                 TotalRevenue = await _repository.GetTotalRevenue()
             };

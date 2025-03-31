@@ -1,5 +1,6 @@
 import { NgClass, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
@@ -16,7 +17,7 @@ export class NavbarComponent implements OnInit {
   isHomeOpen = false;
   isAuth = false;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     this.authService.isAuthenticated().subscribe((authStatus) => {
@@ -43,14 +44,15 @@ export class NavbarComponent implements OnInit {
   }
 
   cart() {
-    window.location.href = '/cart';
+    this.router.navigate(['/cart']);
   }
 
   login() {
-    window.location.href = '/auth/login';
+    this.router.navigate(['/auth/login']);
   }
 
   logout() {
     this.authService.logout();
+    this.router.navigate(['/']);
   }
 }

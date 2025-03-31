@@ -1,6 +1,6 @@
 using Backend.Data;
 using Backend.Interfaces;
-using Backend.Models;
+using Backend.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Repositories
@@ -22,6 +22,18 @@ namespace Backend.Repositories
         public async Task<int> GetTotalProducts()
         {
             return await _context.Products.CountAsync();
+        }
+
+        public async Task<List<CategoryProductCount>> GetProductsByCategory()
+        {
+            return await _context.Products
+                .GroupBy(p => p.Category)
+                .Select(g => new CategoryProductCount
+                {
+                    Category = g.Key.ToString(),
+                    TotalProducts = g.Count()
+                })
+                .ToListAsync();
         }
 
         public async Task<int> GetTotalPurchases()

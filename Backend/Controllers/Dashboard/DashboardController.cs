@@ -8,7 +8,6 @@ namespace Backend.Controllers
 {
     [Route("api/dashboard")]
     [ApiController]
-    [Authorize(Policy = IdentityRoles.Admin)]
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _service;
@@ -18,6 +17,7 @@ namespace Backend.Controllers
             _service = service;
         }
 
+        [Authorize(Policy = IdentityRoles.Admin)]
         [HttpGet]
         public async Task<ActionResult<DashboardDTO>> GetDashboardData()
         {
