@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../core/services/dashboard/dashboard.service';
-import { DashboardModel } from '../../core/models/dashboard/dashboard.model';
+import {
+  DashboardModel,
+  CategorySalesDto,
+  SubcategorySalesDto,
+} from '../../core/models/dashboard/dashboard.model';
 import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
@@ -14,7 +18,10 @@ import { AuthService } from '../../core/services/auth/auth.service';
 export class DashboardComponent implements OnInit {
   dashboardData: DashboardModel | null = null;
 
-  constructor(private dashboardService: DashboardService, private authService: AuthService) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.authService.isAuthenticated().subscribe((isAuth) => {
@@ -25,7 +32,7 @@ export class DashboardComponent implements OnInit {
           this.loadDashboard();
         }
       }
-    })
+    });
   }
 
   loadDashboard(): void {

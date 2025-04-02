@@ -2,21 +2,151 @@
   <h2 class="text-3xl font-bold text-center mb-6">Dashboard</h2>
 
   <!-- Tarjetas de estadísticas -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="bg-blue-500 text-white p-6 rounded-lg shadow-lg text-center">
-      <h3 class="text-xl font-semibold">Total de Usuarios</h3>
-      <p class="text-2xl font-bold">{{ dashboardData?.totalUsers }}</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      class="bg-green-500 text-white p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center h-40"
+    >
+      <h3 class="text-lg font-semibold">Número de Ventas</h3>
+      <p class="text-2xl font-bold">{{ dashboardData?.totalPurchases }}</p>
+      <p class="text-xl">Total en ventas: ${{ dashboardData?.totalRevenue }}</p>
     </div>
 
-    <div class="bg-green-500 text-white p-6 rounded-lg shadow-lg text-center">
-      <h3 class="text-xl font-semibold">Numero de Ventas</h3>
-      <p class="text-2xl font-bold">Cantidad: {{ dashboardData?.totalPurchases }}</p>
-      <p class="text-2xl font-bold">${{ dashboardData?.totalRevenue }}</p>
-    </div>
-
-    <div class="bg-yellow-500 text-white p-6 rounded-lg shadow-lg text-center">
-      <h3 class="text-xl font-semibold">Total de Productos</h3>
+    <div
+      class="bg-yellow-500 text-white p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center h-40"
+    >
+      <h3 class="text-lg font-semibold">Total de Productos</h3>
       <p class="text-2xl font-bold">{{ dashboardData?.totalProducts }}</p>
+    </div>
+  </div>
+
+  <!-- Gráfico de pastel -->
+  <!-- Tabla de Productos por Categoría -->
+  <div class="mt-10 bg-white p-6 rounded-2xl shadow-lg">
+    <h3 class="text-xl font-semibold mb-4 text-center">
+      Productos por Categoría
+    </h3>
+    <div class="overflow-y-auto max-h-60 rounded-xl border border-gray-300">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-gray-300">
+            <th class="p-3 text-left">Categoría</th>
+            <th class="p-3 text-left">Total productos vendidos</th>
+            <th class="p-3 text-left">Porcentaje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let category of dashboardData?.categorySales"
+            class="border-b border-gray-200"
+          >
+            <td class="p-3">{{ category.category }}</td>
+            <td class="p-3 text-center">{{ category.totalSold }}</td>
+            <td class="p-3 text-center">% {{ category.percentageSold }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tabla de Productos por Subcategoría -->
+  <div class="mt-10 bg-white p-6 rounded-2xl shadow-lg">
+    <h3 class="text-xl font-semibold mb-4 text-center">
+      Productos por Subcategoría
+    </h3>
+    <div class="overflow-y-auto max-h-60 rounded-xl border border-gray-300">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-gray-300">
+            <th class="p-3 text-left">Categoria</th>
+            <th class="p-3 text-left">Subcategoría</th>
+            <th class="p-3 text-left">Total de productos vendidos</th>
+            <th class="p-3 text-left">Porcentaje</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let subcategory of dashboardData?.subcategorySales"
+            class="border-b border-gray-200"
+          >
+            <td class="p-3">{{ subcategory.category }}</td>
+            <td class="p-3 text-center">{{ subcategory.subCategory }}</td>
+            <td class="p-3 text-center">{{ subcategory.totalSold }}</td>
+            <td class="p-3 text-center">% {{ subcategory.percentageSold }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tabla de Usuarios con Scroll -->
+  <div class="mt-10 bg-gray-800 text-white p-6 rounded-2xl shadow-lg">
+    <h3 class="text-xl font-semibold mb-4 text-center">Lista de Usuarios</h3>
+    <p class="text-lg font-bold text-center mb-4">
+      Total de usuarios: {{ dashboardData?.totalUsers }}
+    </p>
+
+    <div class="overflow-y-auto max-h-60 rounded-xl border border-gray-700">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-gray-700">
+            <th class="p-3 text-left">Nombre</th>
+            <th class="p-3 text-left">Correo Electrónico</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let user of dashboardData?.users"
+            class="border-b border-gray-600"
+          >
+            <td class="p-3">{{ user.name }}</td>
+            <td class="p-3">{{ user.email }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tabla de Productos con Scroll -->
+  <div class="mt-10 bg-purple-700 text-white p-6 rounded-2xl shadow-lg">
+    <h3 class="text-xl font-semibold mb-4 text-center">Lista de Productos</h3>
+    <p class="text-lg font-bold text-center mb-4">
+      Total de productos: {{ dashboardData?.totalProducts }}
+    </p>
+
+    <!-- Productos por Categoría -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div
+        *ngFor="let category of dashboardData?.productsByCategory"
+        class="bg-purple-600 p-4 rounded-lg shadow-lg text-center"
+      >
+        <p class="text-lg font-semibold">
+          {{ category.category }}: {{ category.totalProducts }}
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="overflow-y-auto max-h-60 mt-6 rounded-xl border border-purple-500"
+    >
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-purple-600">
+            <th class="p-3 text-left">Producto</th>
+            <th class="p-3 text-left">Categoría</th>
+            <th class="p-3 text-left">Precio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let product of dashboardData?.products"
+            class="border-b border-purple-500"
+          >
+            <td class="p-3">{{ product.name }}</td>
+            <td class="p-3">{{ product.category }}</td>
+            <td class="p-3">${{ product.price }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
