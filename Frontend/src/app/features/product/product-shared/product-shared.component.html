@@ -4,6 +4,14 @@
     <p>There are no products available.</p>
   </div>
 
+  <button
+    *ngIf="canAddProduct()"
+    (click)="goToAddProduct()"
+    class="btn btn-primary"
+  >
+    Agregar Producto
+  </button>
+
   <!-- Lista de productos -->
   <ol
     *ngIf="products.length > 0"
@@ -31,10 +39,20 @@
       </p>
 
       <button
-        *ngIf="userId === product.ownerId || userRole === 'admin'"
-        (click)="deleteProduct(product.id!, userId!)"
+        *ngIf="
+          product.ownerId !== undefined &&
+          (userId === product.ownerId || userRole === 'admin')
+        "
+        (click)="deleteProduct(product.id!); $event.stopPropagation()"
       >
         🗑️ Eliminar
+      </button>
+
+      <button
+        *ngIf="userId === product.ownerId"
+        (click)="goToUpdateProduct(product.id!, product.ownerId); $event.stopPropagation()"
+      >
+        ✎ Editar producto
       </button>
     </li>
   </ol>

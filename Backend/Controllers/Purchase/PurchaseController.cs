@@ -1,6 +1,5 @@
 using Backend.Interfaces;
 using Backend.Models;
-using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers

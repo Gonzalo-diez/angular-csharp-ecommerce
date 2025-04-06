@@ -17,8 +17,6 @@ namespace Backend.Data
 
         public DbSet<Invoice> Invoices { get; set; }
 
-        public DbSet<BrowsingHistory> BrowsingHistories { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -59,10 +57,6 @@ namespace Backend.Data
 
             modelBuilder.Entity<Invoice>()
                 .HasIndex(i => i.Date);
-
-            // Índices en BrowsingHistory
-            modelBuilder.Entity<BrowsingHistory>()
-                .HasIndex(bh => new { bh.UserId, bh.ProductId });
         }
 
     }

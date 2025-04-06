@@ -80,5 +80,4 @@ export class ProductAddComponent {
       console.log('Formulario inválido');
     }
   }
-  
 }

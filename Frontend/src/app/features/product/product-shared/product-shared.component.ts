@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { ProductModel } from '../../../core/models/product/product.model';
 import { AuthRole } from '../../../core/models/auth/auth.role';
 import { AuthService } from '../../../core/services/auth/auth.service';
@@ -10,71 +10,73 @@ import { ProductService } from '../../../core/services/product/product.service';
   selector: 'app-product-shared',
   imports: [CommonModule, RouterModule],
   templateUrl: './product-shared.component.html',
-  styleUrl: './product-shared.component.css'
+  styleUrl: './product-shared.component.css',
 })
 export class ProductSharedComponent implements OnInit {
   userId: number | null = null;
   userRole: string | null = null;
 
-  constructor(private authService: AuthService, private productService: ProductService) {}
-
   @Input() products: ProductModel[] = [];
 
+  constructor(
+    private authService: AuthService,
+    private productService: ProductService,
+    private router: Router
+  ) {}
+
   ngOnInit(): void {
-    this.authService.isAuthenticated().subscribe((isAuth) => {
-      if (isAuth) {
-        const token = this.authService.getToken();
-        if (token) {
-          this.userId = this.decodeToken(token);
-        }
+    if (this.authService.isAuthenticated()) {
+      const token = this.authService.getToken();
+      if (token) {
+        const decoded = this.authService.getDecodedUser();
+        this.userId = decoded?.id ? Number(decoded.id) : null; // 🔥 Convertir a número
+        this.userRole = decoded?.role || null;
       }
-    });
+    }
   }
 
-  isAuthenticated() {
-    this.authService.isAuthenticated();
+  canAddProduct(): boolean {
+    return this.userRole === AuthRole.Premium;
   }
 
-  deleteProduct(productId: number, ownerId: number) {
-    if (productId === undefined) {
+  goToAddProduct(): void {
+    if (this.canAddProduct()) {
+      this.router.navigate(['/product/add']);
+    } else {
+      console.warn('🚫 No tienes permisos para agregar productos.');
+    }
+  }
+
+  goToUpdateProduct(productId: number, ownerId: number) {
+    if (!productId) {
+      console.warn('⚠️ Producto sin ID, no se puede editar.');
+      return;
+    }
+
+    if (this.userId !== ownerId) {
+      console.warn('🚫 No tienes permisos para editar este producto.');
+      return;
+    }
+
+    this.router.navigate([`/product/update/${productId}`]);
+  }
+
+  deleteProduct(productId: number) {
+    if (!productId) {
       console.warn('⚠️ Producto sin ID, no se puede eliminar.');
       return;
     }
 
-    if (this.userId !== ownerId && this.userRole !== AuthRole.Admin) {
-      console.warn('You dont have the permission to delete this product');
-      return;
-    }
-
-    this.productService.deleteProduct(productId, Number(this.userId)).subscribe({
-      next: () => {
-        console.log('✅ Producto eliminado con éxito.');
-        this.products = this.products.filter(product => product.id !== productId);
-      },
-      error: (err) => console.error('❌ Error deleting product:', err)
-    })
-  }
-
-  private decodeToken(token: string): number | null {
-    try {
-      const base64Url = token.split('.')[1];
-      if (!base64Url) {
-        console.error('Formato de token inválido');
-        return null;
-      }
-
-      const payload = JSON.parse(atob(base64Url));
-
-      // Extraer userId correctamente
-      if (payload.user) {
-        const userObject = JSON.parse(payload.user);
-        return userObject.Id || null;
-      }
-
-      return null;
-    } catch (e) {
-      console.error('Error al decodificar el token:', e);
-      return null;
-    }
+    this.productService
+      .deleteProduct(productId)
+      .subscribe({
+        next: () => {
+          console.log('✅ Producto eliminado con éxito.');
+          this.products = this.products.filter(
+            (product) => product.id !== productId
+          );
+        },
+        error: (err) => console.error('❌ Error eliminando producto:', err),
+      });
   }
 }

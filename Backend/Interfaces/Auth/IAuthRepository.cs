@@ -7,7 +7,7 @@ namespace Backend.Repositories.Interfaces
         Task<Auth?> GetUserByEmailAsync(string email);
         Task<Auth> CreateUserAsync(Auth user);
         Task<Auth?> GetUserByIdAsync(int id);
-        Task<bool> LogOutUserAsync(int userId);
+        Task<bool> LogOutUserAsync(int? userId);
         Task<Auth?> DeleteUserByIdAsync(int userId);
     }
 }

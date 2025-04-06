@@ -1,7 +1,6 @@
 using Backend.Data;
 using Backend.Models;
 using Backend.Repositories.Interfaces;
-using MercadoPago.Resource.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Repositories
@@ -32,7 +31,7 @@ namespace Backend.Repositories
             return await _context.Users.FindAsync(id);
         }
 
-        public async Task<bool> LogOutUserAsync(int userId)
+        public async Task<bool> LogOutUserAsync(int? userId)
         {
             var user = await _context.Users.FindAsync(userId);
             if (user == null)

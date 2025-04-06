@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './core/guards/auth/roles/admin.guard';
+import { premiumGuard } from './core/guards/auth/roles/premium.guard';
 
 export const routes: Routes = [
     { 
@@ -14,7 +16,8 @@ export const routes: Routes = [
     {
         path: 'product/add',
         loadComponent: () => import('../app/features/product/product-add/product-add.component')
-            .then(m => m.ProductAddComponent)
+            .then(m => m.ProductAddComponent),
+        canActivate: [premiumGuard]
     },
     {
         path: 'product/:id',
@@ -54,6 +57,7 @@ export const routes: Routes = [
     {
         path: 'dashboard',
         loadComponent: () => import('../app/features/dashboard/dashboard.component')
-            .then(m => m.DashboardComponent)
+            .then(m => m.DashboardComponent),
+        canActivate: [adminGuard]
     }
 ];

@@ -94,18 +94,4 @@ namespace Backend.Controllers
             return Ok(new { message = "User deleted successfully", user = deleteUser });
         }
     }
-
-    public class RegisterRequest
-    {
-        public required string Email { get; set; }
-        public required string FirstName { get; set; }
-        public required string LastName { get; set; }
-        public required string Password { get; set; }
-    }
-
-    public class LoginRequest
-    {
-        public required string Email { get; set; }
-        public required string Password { get; set; }
-    }
 }

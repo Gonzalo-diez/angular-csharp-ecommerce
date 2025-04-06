@@ -29,21 +29,16 @@ export class ProductItemComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Obtener el ID del producto desde la URL
     this.productId = Number(this.route.snapshot.paramMap.get('id'));
+    
+    // 🔥 Ahora `isAuthenticated()` devuelve un boolean directamente
+    this.isAuth = this.authService.isAuthenticated();
 
-    // Verificar autenticación
-    this.authService.isAuthenticated().subscribe((isAuth) => {
-      this.isAuth = isAuth; // Asigna el estado de autenticación
-      if (isAuth) {
-        const token = this.authService.getToken();
-        if (token) {
-          this.userId = this.decodeToken(token);
-        }
-      }
-    });
+    if (this.isAuth) {
+      const token = this.authService.getToken();
+      this.userId = token ? this.decodeToken(token) : null;
+    }
 
-    // Cargar el producto
     if (this.productId) {
       this.loadProductById();
     }
@@ -60,51 +55,26 @@ export class ProductItemComponent implements OnInit {
       });
   }
 
-  isAuthenticated() {
-    this.authService.isAuthenticated();
-  }
-
   addProductToCart() {
-    console.log('Intentando agregar producto al carrito'); // Debug
-
-    console.log(this.product?.id);
-
-    console.log(this.userId);
-
     if (this.product && this.userId) {
-      console.log(
-        `UserId: ${this.userId}, ProductId: ${this.product.id}, Quantity: ${this.quantity}`
-      ); // Debug
-
       this.cartService
-        .addProductToCart(this.userId, Number(this.product.id), this.quantity)
+        .addProductToCart(Number(this.product.id), this.quantity)
         .subscribe({
-          next: (cart) => console.log('Producto agregado al carrito', cart),
-          error: (err) =>
-            console.error('Error al agregar producto al carrito:', err),
+          next: (cart) => console.log('✅ Producto agregado al carrito', cart),
+          error: (err) => console.error('❌ Error al agregar producto:', err),
         });
     } else {
-      console.error('Error: producto o userId no definidos'); // Debug
+      console.error('⚠️ Error: producto o userId no definidos');
     }
   }
 
   private decodeToken(token: string): number | null {
     try {
-      const base64Url = token.split('.')[1]; // Extrae la parte del payload del JWT
+      const base64Url = token.split('.')[1];
       if (!base64Url) return null;
 
-      const payload = JSON.parse(atob(base64Url)); // Decodifica el payload
-      console.log('Payload:', payload);
-
-      // Verifica si existe la propiedad "user" y conviértela en objeto
-      const userData = payload.user ? JSON.parse(payload.user) : null;
-      console.log('User Data:', userData);
-
-      // Extrae el ID si existe
-      const id = userData?.Id ?? null;
-      console.log('Id:', id);
-
-      return id;
+      const payload = JSON.parse(atob(base64Url));
+      return payload?.user?.id ?? null; // 🔹 Asegura que se usa `.id` en lugar de `.Id`
     } catch (e) {
       console.error('Error al decodificar el token:', e);
       return null;

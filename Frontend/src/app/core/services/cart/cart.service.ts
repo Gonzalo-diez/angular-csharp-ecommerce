@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { CartModel } from '../../models/cart/cart.model';
 import { CartItemModel } from '../../models/cart/cart-item.model';
 import { InvoiceModel } from '../../models/invoice/invoice.model';
@@ -15,59 +16,47 @@ export class CartService {
 
   constructor(private http: HttpClient) {}
 
-  // ✅ Obtener carrito del usuario (retorna `CartModel`)
-  getCart(userId: number): Observable<CartModel> {
-    return this.http.get<CartModel>(`${this.apiUrl}`, {
-      params: new HttpParams().set('userId', userId),
-    });
+  // ✅ Obtener carrito del usuario
+  getCart(): Observable<CartModel> {
+    return this.http.get<CartModel>(`${this.apiUrl}`).pipe(catchError(this.handleError));
   }
 
   // ✅ Agregar producto al carrito
-  addProductToCart(
-    userId: number,
-    productId: number,
-    quantity: number
-  ): Observable<CartModel> {
-    const body = { productId, quantity };
-    const params = new HttpParams().set('userId', userId);
-
-    return this.http.post<CartModel>(`${this.apiUrl}/add`, body, { params });
-  }
-
-  // ✅ Eliminar producto del carrito (recibe `CartItemModel`)
-  removeFromCart(
-    userId: number,
-    cartItem: CartItemModel
-  ): Observable<CartModel> {
-    return this.http.delete<CartModel>(
-      `${this.apiUrl}/remove/${cartItem.productId}`,
-      {
-        params: new HttpParams().set('userId', userId),
-      }
+  addProductToCart(productId: number, quantity: number): Observable<CartModel> {
+    return this.http.post<CartModel>(`${this.apiUrl}/add`, { productId, quantity }).pipe(
+      catchError(this.handleError)
     );
   }
 
-  // ✅ Vaciar carrito (retorna `CartModel` vacío)
-  clearCart(userId: number): Observable<CartModel> {
-    return this.http.delete<CartModel>(`${this.apiUrl}/clear`, {
-      params: new HttpParams().set('userId', userId),
-    });
-  }
-
-  // ✅ Realizar checkout (retorna `InvoiceModel` con la compra realizada)
-  checkout(userId: number, checkoutRequest: CheckoutRequestModel): Observable<InvoiceModel> {
-    return this.http.post<InvoiceModel>(
-      `${this.apiUrl}/checkout`,
-      checkoutRequest,
-      { params: new HttpParams().set('userId', userId) }
+  // ✅ Eliminar producto del carrito
+  removeFromCart(cartItem: CartItemModel): Observable<CartModel> {
+    return this.http.delete<CartModel>(`${this.apiUrl}/remove/${cartItem.productId}`).pipe(
+      catchError(this.handleError)
     );
   }
-  
 
-  // ✅ Obtener compras del usuario (retorna `PurchaseModel[]`)
-  getPurchases(userId: number): Observable<PurchaseModel[]> {
-    return this.http.get<PurchaseModel[]>(`${this.apiUrl}/purchases`, {
-      params: new HttpParams().set('userId', userId),
-    });
+  // ✅ Vaciar carrito
+  clearCart(): Observable<CartModel> {
+    return this.http.delete<CartModel>(`${this.apiUrl}/clear`).pipe(catchError(this.handleError));
+  }
+
+  // ✅ Realizar checkout
+  checkout(checkoutRequest: CheckoutRequestModel): Observable<InvoiceModel> {
+    return this.http.post<InvoiceModel>(`${this.apiUrl}/checkout`, checkoutRequest).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // ✅ Obtener compras del usuario
+  getPurchases(): Observable<PurchaseModel[]> {
+    return this.http.get<PurchaseModel[]>(`${this.apiUrl}/purchases`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // 🔥 Manejo de errores global
+  private handleError(error: any) {
+    console.error('Error en la solicitud HTTP:', error);
+    return throwError(() => new Error(error.message || 'Error desconocido'));
   }
 }

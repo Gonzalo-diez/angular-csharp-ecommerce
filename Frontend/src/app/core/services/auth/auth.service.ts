@@ -1,104 +1,83 @@
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Injectable, Inject, PLATFORM_ID, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthModel } from '../../models/auth/auth.model';
+import { decodeToken } from '../../utils/token.util';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = 'http://localhost:5169/api/auth';
-  private authStatus = new BehaviorSubject<boolean>(this.hasToken());
 
-  constructor(
-    private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: any
-  ) {}
+  // 🔥 Ahora usamos `signal` en lugar de `BehaviorSubject`
+  authStatus = signal<boolean>(this.hasToken());
 
-  // Método para registrar usuario
-  register(
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string
-  ): Observable<AuthModel> {
-    const body = { firstName, lastName, email, password };
-    return this.http.post<AuthModel>(`${this.apiUrl}/register`, body);
+  constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: any) {
+    if (this.hasToken()) {
+      this.authStatus.set(true);
+    }
   }
 
-  // Método para iniciar sesión
+  register(firstName: string, lastName: string, email: string, password: string): Observable<AuthModel> {
+    return this.http.post<AuthModel>(`${this.apiUrl}/register`, { firstName, lastName, email, password });
+  }
+
   login(email: string, password: string): Observable<AuthModel> {
-    return this.http
-      .post<AuthModel>(`${this.apiUrl}/login`, { email, password })
-      .pipe(
-        tap((res: any) => {
-          if (res.token) {
-            localStorage.setItem('token', res.token);
-            this.authStatus.next(true);
-          }
-        })
-      );
+    return this.http.post<AuthModel>(`${this.apiUrl}/login`, { email, password }).pipe(
+      tap((res: any) => {
+        if (res.token) {
+          localStorage.setItem('token', res.token);
+          this.authStatus.set(true); // 🔥 Ahora usamos `signal`
+        }
+      }),
+      catchError((error) => {
+        console.error('Error in login:', error);
+        return throwError(() => new Error(error.error?.message || 'Error in auth'));
+      })
+    );
   }
 
-  // Método para cerrar sesión
   logout(): void {
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.getToken()}`,
+    this.http.post(`${this.apiUrl}/logout`, {}).subscribe({
+      next: () => {
+        this.removeToken();
+        this.authStatus.set(false);
+      },
+      error: (err) => console.error('Error al cerrar sesión:', err),
     });
-
-    this.http
-      .post<AuthModel>(`${this.apiUrl}/logout`, {}, { headers })
-      .subscribe({
-        next: () => {
-          this.removeToken();
-          this.authStatus.next(false);
-        },
-        error: (err) => {
-          console.error('Error al cerrar sesión:', err);
-        },
-      });
   }
 
-  // Método para obtener un usuario por su ID
   getUserById(userId: number): Observable<AuthModel> {
     return this.http.get<AuthModel>(`${this.apiUrl}/${userId}`);
   }
 
-  // Método para eliminar usuario (solo admin)
   deleteUser(userId: number): Observable<AuthModel> {
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.getToken()}`,
-    });
-    return this.http.delete<AuthModel>(`${this.apiUrl}/delete/${userId}`, {
-      headers,
-    });
+    return this.http.delete<AuthModel>(`${this.apiUrl}/delete/${userId}`);
   }
 
-  // Método para verificar si el usuario está autenticado
-  isAuthenticated(): Observable<boolean> {
-    return this.authStatus.asObservable();
+  isAuthenticated(): boolean {
+    return this.authStatus(); 
   }
 
   getToken(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem('token');
-    }
-    return null;
+    return isPlatformBrowser(this.platformId) ? localStorage.getItem('token') : null;
   }
 
-  // Método para eliminar el token de localStorage
+  getDecodedUser() {
+    const token = this.getToken();
+    return token ? decodeToken(token) : null;
+  }
+
   private removeToken(): void {
-    if (typeof localStorage !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('token');
     }
   }
 
-  // Método privado para verificar si hay un token en localStorage
   private hasToken(): boolean {
-    return (
-      typeof localStorage !== 'undefined' && !!localStorage.getItem('token')
-    );
+    return isPlatformBrowser(this.platformId) && !!localStorage.getItem('token');
   }
 }

@@ -13,7 +13,6 @@ using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using dotenv.net;
 using Newtonsoft.Json;
-using Backend.Services.Interfaces;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -95,9 +94,6 @@ builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 
-builder.Services.AddScoped<IBrowsingHistoryService, BrowsingHistoryService>();
-builder.Services.AddScoped<IBrowsingHistoryRepository, BrowsingHistoryRepository>();
-
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 
@@ -169,6 +165,7 @@ app.UseStaticFiles();
 app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHub<Backend.Hubs.AuthHub>("/authHub");
 app.MapHub<Backend.Hubs.CartHub>("/cartHub");
 app.MapControllers();
 

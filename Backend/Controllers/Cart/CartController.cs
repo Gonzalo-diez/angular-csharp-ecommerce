@@ -1,9 +1,7 @@
 using Backend.DTOs;
 using Backend.Interfaces;
 using Backend.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Backend.Controllers
 {

@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  HttpClient,
-  HttpErrorResponse,
-  HttpHeaders,
-} from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ProductModel } from '../../models/product/product.model';
@@ -14,7 +10,7 @@ import { ProductSubCategory } from '../../models/product/product-sub-category';
   providedIn: 'root',
 })
 export class ProductService {
-  private apiUrl = 'http://localhost:5169/api/product'; // URL del backend
+  private apiUrl = 'http://localhost:5169/api/product';
 
   constructor(private http: HttpClient) {}
 
@@ -31,7 +27,9 @@ export class ProductService {
     if (category) params.category = category;
     if (subCategory) params.subCategory = subCategory;
 
-    return this.http.get<ProductModel[]>(this.apiUrl, { params });
+    return this.http
+      .get<ProductModel[]>(this.apiUrl, { params })
+      .pipe(catchError(this.handleError));
   }
 
   // Obtener un producto por ID
@@ -39,9 +37,12 @@ export class ProductService {
     let params: any = {};
     if (userId) params.userId = userId;
 
-    return this.http.get<ProductModel>(`${this.apiUrl}/${id}`, { params });
+    return this.http
+      .get<ProductModel>(`${this.apiUrl}/${id}`, { params })
+      .pipe(catchError(this.handleError));
   }
 
+  // Obtener productos por categoría
   getAllProductsByCategory(
     category?: string,
     minPrice?: number,
@@ -55,13 +56,10 @@ export class ProductService {
 
     return this.http
       .get<ProductModel[]>(`${this.apiUrl}/category/${category}`, { params })
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.handleErrorCategory(error, category)
-        )
-      );
+      .pipe(catchError(this.handleError));
   }
 
+  // Obtener productos por subcategoría
   getAllProductsBySubCategory(
     category?: string,
     subCategory?: string,
@@ -77,119 +75,56 @@ export class ProductService {
         `${this.apiUrl}/category/${category}/subcategory/${subCategory}`,
         { params }
       )
-      .pipe(
-        catchError((error: HttpErrorResponse) =>
-          this.handleErrorSubCategory(error, category, subCategory)
-        )
-      );
+      .pipe(catchError(this.handleError));
   }
 
   // Agregar un producto (requiere autenticación)
   addProduct(product: ProductModel, image?: File): Observable<ProductModel> {
     const formData = new FormData();
-    formData.append('name', product.name);
-    formData.append('brand', product.brand);
-    formData.append('price', product.price.toString());
-    formData.append('stock', product.stock.toString());
-    formData.append('category', product.category);
-    formData.append('subCategory', product.subCategory);
-    formData.append('status', product.status);
-
-    if (image) {
-      formData.append('image', image);
-    }
-
-    return this.http.post<ProductModel>(`${this.apiUrl}/add`, formData, {
-      headers: this.getAuthHeaders(true),
+    Object.keys(product).forEach((key) => {
+      const value = product[key as keyof ProductModel];
+      if (value !== undefined && value !== null) {
+        formData.append(key, value.toString());
+      }
     });
+
+    if (image) formData.append('image', image);
+
+    return this.http
+      .post<ProductModel>(`${this.apiUrl}/add`, formData)
+      .pipe(catchError(this.handleError));
   }
 
+  // Actualizar un producto (requiere autenticación)
   updateProduct(
     id: number,
     productData: Partial<ProductModel>,
     image?: File
   ): Observable<ProductModel> {
     const formData = new FormData();
-  
-    // Agregar todos los datos de productData dinámicamente
     Object.keys(productData).forEach((key) => {
       const value = productData[key as keyof ProductModel];
       if (value !== undefined && value !== null) {
         formData.append(key, value.toString());
       }
     });
-  
-    // Agregar la imagen si existe
-    if (image) {
-      formData.append('image', image);
-    }
-  
-    return this.http.put<ProductModel>(`${this.apiUrl}/${id}`, formData, {
-      headers: this.getAuthHeaders(true), // Asegúrate de que no incluya 'Content-Type' para FormData
-    });
-  }  
+
+    if (image) formData.append('image', image);
+
+    return this.http
+      .put<ProductModel>(`${this.apiUrl}/${id}`, formData)
+      .pipe(catchError(this.handleError));
+  }
 
   // Eliminar un producto (requiere autenticación)
-  deleteProduct(id: number, userId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}?userId=${userId}`, {
-      headers: this.getAuthHeaders(),
-    });
+  deleteProduct(id: number): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
   }
 
-  // Obtener el token del usuario
-  private getToken(): string | null {
-    return typeof localStorage !== 'undefined'
-      ? localStorage.getItem('token')
-      : null;
-  }
-
-  // Obtener headers con autorización
-  private getAuthHeaders(isMultipart: boolean = false): HttpHeaders {
-    let headers = new HttpHeaders().set(
-      'Authorization',
-      `Bearer ${this.getToken()}`
-    );
-    if (isMultipart) {
-      headers = headers.set('enctype', 'multipart/form-data');
-    } else {
-      headers = headers.set('Content-Type', 'application/json');
-    }
-    return headers;
-  }
-
-  private handleErrorCategory(error: HttpErrorResponse, category?: string) {
-    if (error.status === 404) {
-      console.error(
-        `No se encontraron productos para la categoría '${category}'`
-      );
-      return throwError(
-        () => new Error(`No hay productos disponibles en esta categoría`)
-      );
-    }
-    console.error('Ocurrió un error:', error);
-    return throwError(
-      () => new Error('Algo salió mal, intenta nuevamente más tarde.')
-    );
-  }
-
-  private handleErrorSubCategory(
-    error: HttpErrorResponse,
-    category?: string,
-    subCategory?: string
-  ) {
-    if (error.status === 404) {
-      console.error(
-        `No se encontraron productos para la categoría '${category}' y subcategoría '${
-          subCategory || 'N/A'
-        }'.`
-      );
-      return throwError(
-        () =>
-          new Error(
-            `No hay productos disponibles en esta categoría o subcategoría.`
-          )
-      );
-    }
+  // Manejo de errores
+  private handleError(error: HttpErrorResponse) {
     console.error('Ocurrió un error:', error);
     return throwError(
       () => new Error('Algo salió mal, intenta nuevamente más tarde.')

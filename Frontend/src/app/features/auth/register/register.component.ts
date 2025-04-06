@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth/auth.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { SignalService } from '../../../core/services/signal/signal.service';
 
 @Component({
   selector: 'app-register',
@@ -17,28 +18,33 @@ export class RegisterComponent implements OnInit {
   password = '';
   isAuth = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private signalService: SignalService, private router: Router) {}
 
   ngOnInit(): void {
-    this.authService.isAuthenticated().subscribe((authStatus) => {
-      this.isAuth = authStatus;
-    })
+    // isAuthenticated() ya devuelve un booleano
+    this.isAuth = this.authService.isAuthenticated();
   }
 
-  register() {
-    if(!this.firstName || !this.lastName || !this.email || !this.password) {
-      console.error('Please complete all fields of this form.');
+  register(): void {
+    if (!this.firstName || !this.lastName || !this.email || !this.password) {
+      console.error('Please complete all fields.');
       return;
     }
-
+  
     this.authService.register(this.firstName, this.lastName, this.email, this.password).subscribe({
       next: () => {
-        this.isAuth = true;
-        this.router.navigate(['/']);
+        this.isAuth = this.authService.isAuthenticated();
+        const user = this.authService.getDecodedUser();
+  
+        // 👉 Emitir evento a SignalR
+        this.signalService.sendRegisterNotification(user);
+  
+        this.router.navigateByUrl('/');
       },
       error: (err) => {
         console.error('Error in register:', err);
       }
-    })
+    });
   }
+  
 }

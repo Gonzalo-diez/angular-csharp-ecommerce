@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
-import { AuthRole, AuthRoleMap } from '../../../core/models/auth/auth.role';
+import { SignalService } from '../../../core/services/signal/signal.service';
+import { AuthRole } from '../../../core/models/auth/auth.role';
 
 @Component({
   selector: 'app-login',
@@ -16,86 +17,36 @@ export class LoginComponent implements OnInit {
   password = '';
   isAuth = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private signalService: SignalService, private router: Router) {}
 
   ngOnInit(): void {
-    this.authService.isAuthenticated().subscribe((authStatus) => {
-      this.isAuth = authStatus;
-    });
+    // isAuthenticated() ya devuelve un booleano, por lo que no necesitamos suscribirse.
+    this.isAuth = this.authService.isAuthenticated();
   }
 
-  login() {
+  login(): void {
     if (!this.email || !this.password) {
-      console.error('Please complete all fields of this form.');
+      console.error('Please complete all fields.');
       return;
     }
 
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
-        this.isAuth = true;
-        const token = this.authService.getToken();
+        this.isAuth = this.authService.isAuthenticated();
+        const user = this.authService.getDecodedUser();
 
-        if (token) {
-          const user = this.decodeToken(token);
-          if (user && user.role) {
-            if (user.role === AuthRole.Admin) {
-              this.router.navigate(['/dashboard']);
-            } else {
-              this.router.navigate(['/']);
-            }
-          } else {
-            console.error('User role not found.');
-            this.router.navigate(['/']);
-          }
+        // 👉 Emitir evento a SignalR
+        this.signalService.sendLoginNotification(user);
+
+        if (user?.role === AuthRole.Admin) {
+          this.router.navigateByUrl('/dashboard');
         } else {
-          console.error('Token not found.');
-          this.router.navigate(['/']);
+          this.router.navigateByUrl('/');
         }
       },
       error: (err) => {
-        console.error('Error in login:', err);
+        console.error('Login error:', err);
       },
     });
-  }
-
-  private decodeToken(token: string): { id: number; role: AuthRole } | null {
-    try {
-      const base64Url = token.split('.')[1]; // Extrae la parte del payload del JWT
-      if (!base64Url) return null;
-
-      const payload = JSON.parse(atob(base64Url)); // Decodifica el payload
-      console.log('Payload:', payload);
-
-      // Intentar obtener el rol desde el claim estándar
-      let role: AuthRole | null =
-        payload[
-          'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-        ] ?? null;
-
-      // Si no existe, buscar dentro del objeto `user`
-      if (!role && payload.user) {
-        const userData = JSON.parse(payload.user);
-        role = AuthRoleMap[userData.Role] ?? null; // Convertir número a string usando el mapeo
-      }
-
-      if (!role) {
-        console.error('No se pudo determinar el rol del usuario.');
-        return null;
-      }
-
-      return {
-        id:
-          parseInt(
-            payload[
-              'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
-            ],
-            10
-          ) ?? null,
-        role,
-      };
-    } catch (e) {
-      console.error('Error al decodificar el token:', e);
-      return null;
-    }
   }
 }

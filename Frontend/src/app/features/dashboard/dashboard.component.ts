@@ -24,15 +24,12 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authService.isAuthenticated().subscribe((isAuth) => {
-      if (isAuth) {
-        const token = this.authService.getToken();
-
-        if (token) {
-          this.loadDashboard();
-        }
+    if (this.authService.isAuthenticated()) {
+      const token = this.authService.getToken();
+      if (token) {
+        this.loadDashboard();
       }
-    });
+    }
   }
 
   loadDashboard(): void {

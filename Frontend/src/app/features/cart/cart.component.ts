@@ -47,7 +47,7 @@ export class CartComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.signalService.startConnection();
+    this.signalService.startConnections();
 
     // Suscribirse a cambios en el carrito en tiempo real
     this.signalService.cartUpdates$.subscribe((cart) => {
@@ -57,22 +57,21 @@ export class CartComponent implements OnInit {
       }
     });
 
-    this.authService.isAuthenticated().subscribe((isAuth) => {
-      if (isAuth) {
-        const token = this.authService.getToken();
-        if (token) {
-          this.userId = this.decodeToken(token);
-          if (this.userId) {
-            this.loadCart();
-          }
+    // 🔥 Ahora `isAuthenticated()` devuelve un booleano, no un Observable
+    if (this.authService.isAuthenticated()) {
+      const token = this.authService.getToken();
+      if (token) {
+        this.userId = this.decodeToken(token);
+        if (this.userId) {
+          this.loadCart();
         }
       }
-    });
+    }
   }
 
   loadCart(): void {
     if (!this.userId) return;
-    this.cartService.getCart(this.userId).subscribe({
+    this.cartService.getCart().subscribe({
       next: (cartData) => {
         this.cart = cartData;
       },
@@ -84,7 +83,7 @@ export class CartComponent implements OnInit {
 
   removeItem(cartItem: CartItemModel): void {
     if (!this.userId) return;
-    this.cartService.removeFromCart(this.userId, cartItem).subscribe({
+    this.cartService.removeFromCart(cartItem).subscribe({
       next: (updatedCart) => {
         this.cart = updatedCart ?? {
           id: 0,
@@ -140,7 +139,7 @@ export class CartComponent implements OnInit {
       shippingData: this.shippingData,
     };
 
-    this.cartService.checkout(this.userId, checkoutRequest).subscribe({
+    this.cartService.checkout(checkoutRequest).subscribe({
       next: (invoice: InvoiceModel) => {
         console.log('✅ Compra realizada. Factura generada:', invoice);
 

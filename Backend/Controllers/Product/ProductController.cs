@@ -3,10 +3,7 @@ using Backend.Interfaces;
 using Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.JsonPatch;
 using System.Security.Claims;
-using Backend.Services.Interfaces;
-using Newtonsoft.Json;
 using Backend.DTOs;
 
 namespace Backend.Controllers
@@ -18,12 +15,9 @@ namespace Backend.Controllers
     {
         private readonly IProductService _productService;
 
-        private readonly IBrowsingHistoryService _browsingHistoryService;
-
-        public ProductController(IProductService productService, IBrowsingHistoryService browsingHistoryService)
+        public ProductController(IProductService productService)
         {
             _productService = productService;
-            _browsingHistoryService = browsingHistoryService;
         }
 
 
@@ -38,11 +32,6 @@ namespace Backend.Controllers
         {
             var product = await _productService.GetProductById(id);
             if (product == null) return NotFound();
-            if (userId.HasValue)
-            {
-                await _browsingHistoryService.AddToHistoryAsync(userId, id);
-            }
-
 
             return Ok(product);
         }

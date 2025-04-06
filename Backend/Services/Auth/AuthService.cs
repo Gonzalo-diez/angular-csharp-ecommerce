@@ -6,6 +6,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.SignalR;
+using Backend.Hubs;
 
 namespace Backend.Services
 {
@@ -14,12 +16,14 @@ namespace Backend.Services
         private readonly IAuthRepository _authRepository;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHubContext<AuthHub> _authHub;
 
-        public AuthService(IAuthRepository authRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public AuthService(IAuthRepository authRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IHubContext<AuthHub> authHub)
         {
             _authRepository = authRepository;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _authHub = authHub;
         }
 
         public async Task<Auth?> GetCurrentUser()
@@ -51,6 +55,12 @@ namespace Backend.Services
             if (user == null || string.IsNullOrEmpty(user.Password) || !user.VerifyPassword(password))
                 return null;
 
+            await _authHub.Clients.All.SendAsync("UserLoggedIn", new
+            {
+                UserId = user.Id,
+                Email = user.Email
+            });
+
             return GenerateJwtToken(user);
         }
 
@@ -61,11 +71,29 @@ namespace Backend.Services
 
             string token = GenerateJwtToken(createdUser);
 
+            await _authHub.Clients.All.SendAsync("UserRegistered", new
+            {
+                UserId = createdUser.Id,
+                Email = createdUser.Email
+            });
+
+
             return (createdUser, token);
         }
 
-        public async Task<bool> LogOutUserAsync(int userId)
+        public async Task<bool> LogOutUserAsync(int? userId)
         {
+            if (userId == null)
+            {
+                throw new ArgumentNullException(nameof(userId), "UserId cant be null");
+            }
+
+            await _authHub.Clients.All.SendAsync("UserLoggedOut", new
+            {
+                UserId = userId
+            });
+
+
             return await _authRepository.LogOutUserAsync(userId);
         }
 
