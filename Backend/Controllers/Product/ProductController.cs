@@ -27,6 +27,15 @@ namespace Backend.Controllers
             return Ok(await _productService.GetAllProducts(minPrice, maxPrice, productCategory, productSubCategory));
         }
 
+        [HttpGet("search")]
+        public async Task<ActionResult<List<Product>>> SearchProducts([FromQuery] string query)
+        {
+            var products = await _productService.SearchProducts(query);
+            if (products == null) return NotFound();
+
+            return Ok(products);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProductById(int id, [FromQuery] int? userId)
         {
@@ -104,7 +113,7 @@ namespace Backend.Controllers
                     await image.CopyToAsync(fileStream);
                 }
 
-                product.ImageUrl = $"/images/{uniqueFileName}"; // Ruta relativa para acceder desde el frontend
+                product.ImageUrl = $"/images/{uniqueFileName}";
             }
 
             var newProduct = await _productService.AddProduct(product);

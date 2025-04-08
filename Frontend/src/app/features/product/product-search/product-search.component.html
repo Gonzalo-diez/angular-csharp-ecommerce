@@ -1,0 +1,45 @@
+<div class="container mx-auto px-4 py-8">
+  <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-800">
+    Resultados para: <span class="text-indigo-600">"{{ searchQuery }}"</span>
+  </h2>
+
+  <div *ngIf="products.length === 0" class="text-center text-gray-500">
+    No se encontraron productos.
+  </div>
+
+  <div
+    *ngIf="products.length > 0"
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+  >
+    <div
+      *ngFor="let product of products"
+      class="bg-white rounded-2xl shadow-md hover:shadow-lg transition duration-300 p-4 flex flex-col"
+    >
+      <img
+        *ngIf="product.imageUrl"
+        [src]="'http://localhost:5169' + product.imageUrl"
+        [alt]="product.name"
+        class="w-full h-48 object-cover rounded-xl mb-4"
+      />
+
+      <div class="flex-1">
+        <h3 class="text-lg font-semibold text-gray-900 mb-1 truncate">
+          {{ product.name }}
+        </h3>
+        <p class="text-gray-500 text-sm mb-1 truncate">
+          {{ product.category }}
+        </p>
+        <p class="text-indigo-600 font-bold text-lg mb-3">
+          ${{ product.price }}
+        </p>
+      </div>
+
+      <a
+        [routerLink]="['/product', product._id]"
+        class="mt-auto text-center bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+      >
+        Ver más
+      </a>
+    </div>
+  </div>
+</div>

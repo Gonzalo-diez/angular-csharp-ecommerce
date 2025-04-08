@@ -5,6 +5,7 @@ namespace Backend.Interfaces
     public interface IProductService
     {
         Task<List<Product>> GetAllProducts(decimal? minPrice, decimal? maxPrice, ProductCategory? productCategory, ProductSubCategory? productSubCategory);
+        Task<List<Product>> SearchProducts(string query);
         Task<Product?> GetProductById(int id);
         Task<List<Product>> GetProductsByCategory(string productCategory, ProductSubCategory? productSubCategory, decimal? minPrice, decimal? maxPrice);
         Task<List<Product>> GetProductsBySubCategory(string productCategory, string productSubCategory, decimal? minPrice, decimal? maxPrice);

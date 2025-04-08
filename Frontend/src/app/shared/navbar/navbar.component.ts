@@ -1,13 +1,15 @@
 import { Component, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ProductService } from '../../core/services/product/product.service';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { SignalService } from '../../core/services/signal/signal.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
@@ -18,8 +20,10 @@ export class NavbarComponent {
   isClothingOpen = false;
   isHomeOpen = false;
   isAuth = false;
+  searchTerm = '';
 
   constructor(
+    private productService: ProductService,
     private authService: AuthService,
     private signalService: SignalService,
     private router: Router
@@ -42,6 +46,14 @@ export class NavbarComponent {
     if (category === 'tech') this.isTechOpen = !this.isTechOpen;
     if (category === 'clothing') this.isClothingOpen = !this.isClothingOpen;
     if (category === 'home') this.isHomeOpen = !this.isHomeOpen;
+  }
+
+  search() {
+    if (this.searchTerm.trim()) {
+      this.router.navigate(['/product/search'], { queryParams: { q: this.searchTerm } });
+      this.searchTerm = '';
+      if (this.isSidebarOpen) this.toggleSidebar();
+    }
   }
 
   isAuthenticated() {

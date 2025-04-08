@@ -24,6 +24,11 @@ namespace Backend.Services
             return await _productRepository.GetAllProducts(minPrice, maxPrice, productCategory, productSubCategory);
         }
 
+        public async Task<List<Product>> SearchProducts(string query)
+        {
+            return await _productRepository.SearchProducts(query);
+        }
+
         public async Task<Product?> GetProductById(int id)
         {
             return await _productRepository.GetProductById(id);

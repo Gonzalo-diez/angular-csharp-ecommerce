@@ -29,7 +29,7 @@ export class ProductSharedComponent implements OnInit {
       const token = this.authService.getToken();
       if (token) {
         const decoded = this.authService.getDecodedUser();
-        this.userId = decoded?.id ? Number(decoded.id) : null; // 🔥 Convertir a número
+        this.userId = decoded?.id ? Number(decoded.id) : null;
         this.userRole = decoded?.role || null;
       }
     }

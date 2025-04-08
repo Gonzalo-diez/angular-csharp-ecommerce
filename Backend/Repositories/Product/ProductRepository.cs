@@ -3,6 +3,7 @@ using Backend.Interfaces;
 using Backend.Models;
 using Backend.Constants;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Backend.Repositories
 {
@@ -35,6 +36,16 @@ namespace Backend.Repositories
                 query = query.Where(p => p.SubCategory == productSubCategory.Value);
 
             return await query.ToListAsync();
+        }
+
+        public async Task<List<Product>> SearchProducts(string query)
+        {
+            var loweredQuery = query.ToLower();
+
+            return await _context.Products
+                .Where(p => p.Name.ToLower().Contains(loweredQuery) ||
+                            p.Brand.ToLower().Contains(loweredQuery))
+                .ToListAsync();
         }
 
         public async Task<Product?> GetProductById(int id)

@@ -32,6 +32,15 @@ export class ProductService {
       .pipe(catchError(this.handleError));
   }
 
+  // Barra de busqueda
+  searchProducts(query: string): Observable<ProductModel[]> {
+    return this.http
+      .get<ProductModel[]>(`${this.apiUrl}/search`, {
+        params: { query },
+      })
+      .pipe(catchError(this.handleError));
+  }
+
   // Obtener un producto por ID
   getProductById(id: number, userId?: number): Observable<ProductModel> {
     let params: any = {};
