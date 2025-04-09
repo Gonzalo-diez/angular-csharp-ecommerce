@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => isLoading = false);
 
-    if (!success) {
+    if (!context.mounted && !success) {
       setState(() {
         errorMessage = 'Correo o contraseña incorrectos';
       });
