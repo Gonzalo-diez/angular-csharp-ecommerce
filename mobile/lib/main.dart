@@ -4,6 +4,7 @@ import 'services/auth/auth_service.dart';
 import 'widgets/main_layout.dart';
 import 'screens/product/product-list/product_list_screen.dart';
 import 'screens/auth/login_screen.dart';
+import 'screens/product/product-search/product_search_screen.dart';
 
 void main() {
   runApp(
@@ -57,6 +58,10 @@ class _MyAppState extends State<MyApp> {
               showSearchBar: true,
               child: const ProductListScreen(),
             ),
+        '/search': (context) {
+          final query = ModalRoute.of(context)?.settings.arguments as String;
+          return ProductSearchScreen(query: query);
+        },
       },
       initialRoute: '/',
     );

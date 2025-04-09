@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/product/product_model.dart';
 import '../../../services/product/product_service.dart';
+import '../../../screens/product/product-item/product_item_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -248,10 +249,19 @@ class _ProductListScreenState extends State<ProductListScreen> {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 child: ListTile(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (_) => ProductItemScreen(productId: product.id.toString()),
+                      ),
+                    );
+                  },
                   leading:
                       product.imageUrl != null
                           ? Image.network(
-                            'http://10.0.2.2:5169${product.imageUrl!}',
+                            'http://192.168.1.6:5180${product.imageUrl!}',
                             width: 100,
                             height: 60,
                             fit: BoxFit.cover,

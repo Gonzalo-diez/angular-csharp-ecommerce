@@ -23,13 +23,19 @@ class MainLayout extends StatelessWidget {
     final logger = Logger();
 
     return Scaffold(
-      appBar: showSearchBar
-          ? CustomNavBar(
-              searchController: searchController,
-              onSearch: (query) => logger.i('🔍 Buscar: $query'),
-              onCartPressed: () => logger.i('🛒 Ir al carrito'),
-            )
-          : null,
+      appBar:
+          showSearchBar
+              ? CustomNavBar(
+                searchController: searchController,
+                onSearch: (query) {
+                  if (query.trim().isNotEmpty) {
+                    Navigator.pushNamed(context, '/search', arguments: query);
+                    searchController.clear();
+                  }
+                },
+                onCartPressed: () => logger.i('🛒 Ir al carrito'),
+              )
+              : null,
       body: child,
       bottomNavigationBar: CustomFooter(
         currentIndex: currentIndex,
