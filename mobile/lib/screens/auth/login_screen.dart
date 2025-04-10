@@ -27,16 +27,17 @@ class _LoginScreenState extends State<LoginScreen> {
     final success = await authService.login(
       emailController.text,
       passwordController.text,
+      context, // ahora le pasás el context
     );
 
     setState(() => isLoading = false);
 
-    if (!context.mounted && !success) {
+    if (!success) {
+      if (!context.mounted) return;
+
       setState(() {
         errorMessage = 'Correo o contraseña incorrectos';
       });
-    } else {
-      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
     }
   }
 
@@ -123,7 +124,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           recognizer:
                               TapGestureRecognizer()
                                 ..onTap = () {
-                                  Navigator.of(context).pushNamed('/auth/register');
+                                  Navigator.of(
+                                    context,
+                                  ).pushNamed('/auth/register');
                                 },
                         ),
                       ],

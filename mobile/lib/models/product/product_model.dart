@@ -1,5 +1,14 @@
 enum ProductCategory { technology, clothing, home }
 
+extension ProductCategoryExtension on ProductCategory {
+  static ProductCategory fromString(String value) {
+    return ProductCategory.values.firstWhere(
+      (e) => e.name.toLowerCase() == value.toLowerCase(),
+      orElse: () => ProductCategory.technology, // Valor por defecto
+    );
+  }
+}
+
 enum ProductSubCategory {
   pc,
   console,
@@ -12,7 +21,25 @@ enum ProductSubCategory {
   decor,
 }
 
+extension ProductSubCategoryExtension on ProductSubCategory {
+  static ProductSubCategory fromString(String value) {
+    return ProductSubCategory.values.firstWhere(
+      (e) => e.name.toLowerCase() == value.toLowerCase(),
+      orElse: () => ProductSubCategory.pc,
+    );
+  }
+}
+
 enum ProductStatus { enable, outOfStock, disable }
+
+extension ProductStatusExtension on ProductStatus {
+  static ProductStatus fromString(String value) {
+    return ProductStatus.values.firstWhere(
+      (e) => e.name.toLowerCase() == value.toLowerCase(),
+      orElse: () => ProductStatus.enable,
+    );
+  }
+}
 
 class Product {
   final int id;
@@ -54,9 +81,9 @@ class Product {
           json['stock'] is int
               ? json['stock']
               : int.parse(json['stock'].toString()),
-      category: ProductCategory.values[json['category']],
-      subCategory: ProductSubCategory.values[json['subCategory']],
-      status: ProductStatus.values[json['status']],
+      category: ProductCategoryExtension.fromString(json['category']),
+      subCategory: ProductSubCategoryExtension.fromString(json['subCategory']),
+      status: ProductStatusExtension.fromString(json['status']),
       ownerId: json['ownerId'],
       imageUrl: json['imageUrl']?.toString(),
     );
@@ -69,7 +96,7 @@ class Product {
       'brand': brand,
       'price': price,
       'stock': stock,
-      'category': category.index, 
+      'category': category.index,
       'subCategory': subCategory.index,
       'status': status.index,
       'ownerId': ownerId,

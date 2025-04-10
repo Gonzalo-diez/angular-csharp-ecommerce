@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/screens/auth/register_screen.dart';
 import 'package:provider/provider.dart';
 import 'services/auth/auth_service.dart';
 import 'widgets/main_layout.dart';
 import 'screens/product/product-list/product_list_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/product/product-search/product_search_screen.dart';
+import 'screens/auth/register_screen.dart';
+import 'screens/dashboard/dashboard_screen.dart';
 
 void main() {
   runApp(
@@ -51,6 +52,7 @@ class _MyAppState extends State<MyApp> {
             ),
         '/auth/login': (context) => const LoginScreen(),
         '/auth/register': (context) => const RegisterScreen(),
+        '/dashboard': (context) => const DashboardScreen(),
         '/home':
             (context) => MainLayout(
               currentIndex: 0,
