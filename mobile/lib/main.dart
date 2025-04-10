@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/auth/register_screen.dart';
 import 'package:provider/provider.dart';
 import 'services/auth/auth_service.dart';
 import 'widgets/main_layout.dart';
@@ -48,7 +49,8 @@ class _MyAppState extends State<MyApp> {
                       ? screens[_currentIndex]
                       : const LoginScreen(),
             ),
-        '/login': (context) => const LoginScreen(),
+        '/auth/login': (context) => const LoginScreen(),
+        '/auth/register': (context) => const RegisterScreen(),
         '/home':
             (context) => MainLayout(
               currentIndex: 0,

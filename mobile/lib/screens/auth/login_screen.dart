@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth/auth_service.dart';
 
@@ -104,6 +105,30 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                           : const Text('Entrar'),
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: RichText(
+                    text: TextSpan(
+                      text: '¿No tienes una cuenta? ',
+                      style: const TextStyle(color: Colors.black),
+                      children: [
+                        TextSpan(
+                          text: 'Regístrate',
+                          style: const TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer:
+                              TapGestureRecognizer()
+                                ..onTap = () {
+                                  Navigator.of(context).pushNamed('/auth/register');
+                                },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
