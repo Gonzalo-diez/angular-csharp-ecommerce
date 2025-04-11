@@ -3,7 +3,7 @@ import '../../services/dashboard/dashboard_service.dart';
 import '../../models/dashboard/dashboard_model.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();

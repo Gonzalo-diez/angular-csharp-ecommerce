@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
 import 'custom_navbar.dart';
 import 'custom_footer.dart';
 
@@ -20,7 +19,6 @@ class MainLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final searchController = TextEditingController();
-    final logger = Logger();
 
     return Scaffold(
       appBar:
@@ -33,7 +31,9 @@ class MainLayout extends StatelessWidget {
                     searchController.clear();
                   }
                 },
-                onCartPressed: () => logger.i('🛒 Ir al carrito'),
+                onCartPressed: () {
+                  Navigator.pushNamed(context, '/cart');
+                },
               )
               : null,
       body: child,

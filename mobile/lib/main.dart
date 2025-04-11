@@ -7,6 +7,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/product/product-search/product_search_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/cart/cart_screen.dart';
 
 void main() {
   runApp(
@@ -53,6 +54,7 @@ class _MyAppState extends State<MyApp> {
         '/auth/login': (context) => const LoginScreen(),
         '/auth/register': (context) => const RegisterScreen(),
         '/dashboard': (context) => const DashboardScreen(),
+        '/cart': (context) => const CartScreen(),
         '/home':
             (context) => MainLayout(
               currentIndex: 0,

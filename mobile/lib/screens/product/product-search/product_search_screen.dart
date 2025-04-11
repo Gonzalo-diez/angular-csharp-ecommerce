@@ -12,7 +12,7 @@ class ProductSearchScreen extends StatefulWidget {
 }
 
 class _ProductSearchScreenState extends State<ProductSearchScreen> {
-  late Future<List<Product>> _results;
+  late Future<List<ProductModel>> _results;
 
   @override
   void initState() {
@@ -29,7 +29,7 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
         foregroundColor: Colors.black87,
         elevation: 2,
       ),
-      body: FutureBuilder<List<Product>>(
+      body: FutureBuilder<List<ProductModel>>(
         future: _results,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

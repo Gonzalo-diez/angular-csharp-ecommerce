@@ -12,7 +12,7 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListScreenState extends State<ProductListScreen> {
   final ProductService _productService = ProductService();
-  late Future<List<Product>> _productsFuture;
+  late Future<List<ProductModel>> _productsFuture;
 
   // Filtros
   double? _minPrice;
@@ -224,7 +224,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
           ),
         ],
       ),
-      body: FutureBuilder<List<Product>>(
+      body: FutureBuilder<List<ProductModel>>(
         future: _productsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

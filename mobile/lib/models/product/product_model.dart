@@ -41,7 +41,7 @@ extension ProductStatusExtension on ProductStatus {
   }
 }
 
-class Product {
+class ProductModel {
   final int id;
   final String name;
   final String brand;
@@ -58,7 +58,7 @@ class Product {
     return '📦 Producto(id: $id, name: $name, brand: $brand, price: \$${price.toStringAsFixed(2)}, stock: $stock, category: $category, subCategory: $subCategory, status: $status, imageUrl: $imageUrl)';
   }
 
-  Product({
+  ProductModel({
     required this.id,
     required this.name,
     required this.brand,
@@ -71,8 +71,8 @@ class Product {
     this.imageUrl,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
       id: json['id'] is int ? json['id'] : int.parse(json['id'].toString()),
       name: json['name'].toString(),
       brand: json['brand'].toString(),
@@ -81,9 +81,9 @@ class Product {
           json['stock'] is int
               ? json['stock']
               : int.parse(json['stock'].toString()),
-      category: ProductCategoryExtension.fromString(json['category']),
-      subCategory: ProductSubCategoryExtension.fromString(json['subCategory']),
-      status: ProductStatusExtension.fromString(json['status']),
+      category: ProductCategoryExtension.fromString(json['category'].toString()),
+      subCategory: ProductSubCategoryExtension.fromString(json['subCategory'].toString()),
+      status: ProductStatusExtension.fromString(json['status'].toString()),
       ownerId: json['ownerId'],
       imageUrl: json['imageUrl']?.toString(),
     );

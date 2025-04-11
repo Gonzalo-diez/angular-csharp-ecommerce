@@ -12,7 +12,7 @@ class ProductService {
   );
 
   // Obtener todos los productos con filtros
-  Future<List<Product>> getAllProducts({
+  Future<List<ProductModel>> getAllProducts({
     double? minPrice,
     double? maxPrice,
     ProductCategory? category,
@@ -34,7 +34,7 @@ class ProductService {
 
       if (response.statusCode == 200) {
         final List<dynamic> body = jsonDecode(response.body);
-        final products = body.map((json) => Product.fromJson(json)).toList();
+        final products = body.map((json) => ProductModel.fromJson(json)).toList();
         _logger.i('✅ Productos recibidos del backend (${products.length})');
         return products;
       } else {
@@ -48,7 +48,7 @@ class ProductService {
   }
 
   // Buscar productos
-  Future<List<Product>> searchProducts(String query) async {
+  Future<List<ProductModel>> searchProducts(String query) async {
     try {
       final uri = Uri.parse(
         '$baseUrl/search',
@@ -57,7 +57,7 @@ class ProductService {
 
       if (response.statusCode == 200) {
         final List<dynamic> body = jsonDecode(response.body);
-        return body.map((json) => Product.fromJson(json)).toList();
+        return body.map((json) => ProductModel.fromJson(json)).toList();
       } else {
         throw Exception('Error searching products: ${response.statusCode}');
       }
@@ -68,7 +68,7 @@ class ProductService {
   }
 
   // Obtener producto por ID
-  Future<Product> getProductById(int id, {int? userId}) async {
+  Future<ProductModel> getProductById(int id, {int? userId}) async {
     try {
       final uri = Uri.parse('$baseUrl/$id').replace(
         queryParameters: userId != null ? {'userId': userId.toString()} : null,
@@ -76,7 +76,7 @@ class ProductService {
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
-        return Product.fromJson(jsonDecode(response.body));
+        return ProductModel.fromJson(jsonDecode(response.body));
       } else {
         throw Exception('Error loading product: ${response.statusCode}');
       }
@@ -87,7 +87,7 @@ class ProductService {
   }
 
   // Agregar producto
-  Future<Product> addProduct(Product product, {File? image}) async {
+  Future<ProductModel> addProduct(ProductModel product, {File? image}) async {
     try {
       var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/add'));
 
@@ -109,7 +109,7 @@ class ProductService {
       final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return Product.fromJson(jsonDecode(responseBody));
+        return ProductModel.fromJson(jsonDecode(responseBody));
       } else {
         throw Exception('Error adding product: ${response.statusCode}');
       }
@@ -120,7 +120,7 @@ class ProductService {
   }
 
   // Actualizar producto
-  Future<Product> updateProduct(
+  Future<ProductModel> updateProduct(
     int id,
     Map<String, dynamic> productData, {
     File? image,
@@ -146,7 +146,7 @@ class ProductService {
       final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
-        return Product.fromJson(jsonDecode(responseBody));
+        return ProductModel.fromJson(jsonDecode(responseBody));
       } else {
         throw Exception('Error updating product: ${response.statusCode}');
       }
