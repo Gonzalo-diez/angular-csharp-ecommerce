@@ -85,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   obscureText: true,
                   decoration: const InputDecoration(
                     labelText: 'Contraseña',
+                    prefixIcon: Icon(Icons.password),
                     border: OutlineInputBorder(),
                   ),
                 ),

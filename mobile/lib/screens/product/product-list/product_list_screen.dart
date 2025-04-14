@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../models/product/product_model.dart';
 import '../../../services/product/product_service.dart';
 import '../../../screens/product/product-item/product_item_screen.dart';
+import '../../../screens/product/product-add/product_add_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -254,7 +255,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       context,
                       MaterialPageRoute(
                         builder:
-                            (_) => ProductItemScreen(productId: product.id.toString()),
+                            (_) => ProductItemScreen(
+                              productId: product.id.toString(),
+                            ),
                       ),
                     );
                   },
@@ -288,6 +291,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => ProductAddScreen()),
+          );
+        },
+        tooltip: 'Agregar producto',
+        child: const Icon(Icons.add),
       ),
     );
   }

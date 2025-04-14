@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/models/product/product_model.dart';
+import 'package:mobile/screens/product/product-add/product_add_screen.dart';
 import 'package:mobile/screens/product/product-subcategory/product_subcategory_screen.dart';
 import 'package:provider/provider.dart';
 import 'services/auth/auth_service.dart';
@@ -86,6 +87,7 @@ class _MyAppState extends State<MyApp> {
 
           return ProductSubcategoryScreen(category: category, subCategory: subcategory);
         },
+        '/add': (context) => const ProductAddScreen(),
         '/home':
             (context) => MainLayout(
               currentIndex: 0,

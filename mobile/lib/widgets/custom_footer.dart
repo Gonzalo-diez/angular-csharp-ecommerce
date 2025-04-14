@@ -22,7 +22,7 @@ class CustomFooter extends StatelessWidget {
             currentIndex: currentIndex,
             onTap: (index) async {
               if (index == 2) {
-                Scaffold.of(context).openDrawer(); // 👈 Abre el sidebar
+                Scaffold.of(context).openDrawer();
               } else if (auth.isAuthenticated && index == 1) {
                 await auth.logout();
                 if (context.mounted) {

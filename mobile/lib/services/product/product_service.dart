@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/product/product_model.dart';
 
 class ProductService {
@@ -10,6 +11,20 @@ class ProductService {
   final Logger _logger = Logger(
     printer: PrettyPrinter(methodCount: 0, colors: true, printEmojis: true),
   );
+
+  Future<Map<String, String>> _getAuthHeaders() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) throw Exception('No se encontró el token');
+
+    _logger.i('Token: $token');
+
+    return {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+  }
 
   // Obtener todos los productos con filtros
   Future<List<ProductModel>> getAllProducts({
@@ -154,8 +169,15 @@ class ProductService {
 
   // Agregar producto
   Future<ProductModel> addProduct(ProductModel product, {File? image}) async {
+    final prefs = await SharedPreferences.getInstance();
+    final headers = await _getAuthHeaders();
+    final userId = prefs.getInt('userId').toString();
+    final uri = Uri.parse('$baseUrl/add?userId=$userId');
+    
     try {
-      var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/add'));
+      var request = http.MultipartRequest('POST', uri);
+
+      request.headers.addAll(headers);
 
       product.toJson().forEach((key, value) {
         if (value != null) request.fields[key] = value.toString();
@@ -191,8 +213,15 @@ class ProductService {
     Map<String, dynamic> productData, {
     File? image,
   }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final headers = await _getAuthHeaders();
+    final userId = prefs.getInt('userId').toString();
+    final uri = Uri.parse('$baseUrl/$id?userId=$userId');
+
     try {
-      var request = http.MultipartRequest('PUT', Uri.parse('$baseUrl/$id'));
+      var request = http.MultipartRequest('PUT', uri);
+
+      request.headers.addAll(headers);
 
       productData.forEach((key, value) {
         if (value != null) request.fields[key] = value.toString();
@@ -224,8 +253,13 @@ class ProductService {
 
   // Eliminar producto
   Future<void> deleteProduct(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final headers = await _getAuthHeaders();
+    final userId = prefs.getInt('userId').toString();
+    final uri = Uri.parse('$baseUrl/id?userId=$userId');
+
     try {
-      final response = await http.delete(Uri.parse('$baseUrl/$id'));
+      final response = await http.delete(uri, headers: headers);
 
       if (response.statusCode == 200) {
         _logger.i('🗑️ Producto eliminado correctamente');
