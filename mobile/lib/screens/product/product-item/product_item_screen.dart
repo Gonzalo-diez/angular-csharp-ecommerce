@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../models/product/product_model.dart';
-import '../../../services/product/product_service.dart';
-import '../../../services/cart/cart_service.dart';
+import 'package:mobile/models/product/product_model.dart';
+import 'package:mobile/services/product/product_service.dart';
+import 'package:mobile/services/cart/cart_service.dart';
 
 class ProductItemScreen extends StatefulWidget {
   final String productId;

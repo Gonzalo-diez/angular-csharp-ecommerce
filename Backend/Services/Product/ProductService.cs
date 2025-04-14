@@ -49,7 +49,7 @@ namespace Backend.Services
             return await _productRepository.AddProduct(product);
         }
 
-        public async Task<bool?> UpdateProduct(int id, Product updatedProduct, int userId)
+        public async Task<bool?> UpdateProduct(int id, Product updatedProduct, int? userId)
         {
             if (updatedProduct.Stock <= 0)
             {
@@ -83,7 +83,7 @@ namespace Backend.Services
             await _emailService.SendEmail(owner.Email, "Stock bajo en tu producto", message);
         }
 
-        public async Task<bool> DeleteProduct(int id, int userId)
+        public async Task<bool> DeleteProduct(int id, int? userId)
         {
             return await _productRepository.DeleteProduct(id, userId);
         }

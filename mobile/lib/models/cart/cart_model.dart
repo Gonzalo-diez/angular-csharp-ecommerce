@@ -1,5 +1,5 @@
-import 'cart_item_model.dart';
-import '../auth/auth_model.dart';
+import 'package:mobile/models/cart/cart_item_model.dart';
+import 'package:mobile/models/auth/auth_model.dart';
 
 class CartModel {
   final int id;

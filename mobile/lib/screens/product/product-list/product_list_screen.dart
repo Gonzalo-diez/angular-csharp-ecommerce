@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../models/product/product_model.dart';
-import '../../../services/product/product_service.dart';
-import '../../../screens/product/product-item/product_item_screen.dart';
-import '../../../screens/product/product-add/product_add_screen.dart';
+import 'package:mobile/models/product/product_model.dart';
+import 'package:provider/provider.dart';
+import 'package:mobile/services/auth/auth_service.dart';
+import 'package:mobile/services/product/product_service.dart';
+import 'package:mobile/screens/product/product-item/product_item_screen.dart';
+import 'package:mobile/screens/product/product-add/product_add_screen.dart';
+import 'package:mobile/screens/product/product-update/product_update_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -214,6 +217,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<AuthService>(context, listen: false);
+    final currentUserId = auth.userId;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lista de Productos'),
@@ -284,6 +290,65 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         'Categoría: ${_capitalize(product.category.name)} - ${_capitalize(product.subCategory.name)}',
                       ),
                       Text('Estado: ${_formatStatus(product.status)}'),
+                    ],
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Mostrar botón de editar solo si el usuario es el dueño
+                      if (product.ownerId == currentUserId)
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => ProductUpdateScreen(
+                                      productId: product.id,
+                                      product: product,
+                                    ),
+                              ),
+                            );
+                          },
+                        ),
+
+                      // Mostrar botón de eliminar si es el dueño o admin
+                      if (product.ownerId == currentUserId || auth.isAdmin)
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder:
+                                  (context) => AlertDialog(
+                                    title: const Text('Confirmar eliminación'),
+                                    content: const Text(
+                                      '¿Estás seguro de que querés eliminar este producto?',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed:
+                                            () => Navigator.of(
+                                              context,
+                                            ).pop(false),
+                                        child: const Text('Cancelar'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed:
+                                            () =>
+                                                Navigator.of(context).pop(true),
+                                        child: const Text('Eliminar'),
+                                      ),
+                                    ],
+                                  ),
+                            );
+
+                            if (confirm == true) {
+                              await _productService.deleteProduct(product.id);
+                            }
+                          },
+                        ),
                     ],
                   ),
                 ),

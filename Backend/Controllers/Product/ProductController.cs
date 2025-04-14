@@ -75,15 +75,14 @@ namespace Backend.Controllers
         [HttpPost("add")]
         public async Task<ActionResult<Product>> AddProduct(
         [FromForm] AddProductDto productDto,
-        IFormFile? image)
+        IFormFile? image,
+        [FromQuery] int? userId)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim))
             {
                 return Unauthorized("User ID not found in token.");
             }
-
-            var userId = int.Parse(userIdClaim);
 
             var product = new Product
             {
@@ -125,15 +124,14 @@ namespace Backend.Controllers
         public async Task<ActionResult<Product>> UpdateProduct(
             int id,
             [FromForm] UpdateProductDto productDto,
-            IFormFile? image)
+            IFormFile? image,
+            [FromQuery] int? userId)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim))
             {
                 return Unauthorized("User ID not found in token.");
             }
-
-            var userId = int.Parse(userIdClaim);
 
             var product = await _productService.GetProductById(id);
             if (product == null)
@@ -187,11 +185,11 @@ namespace Backend.Controllers
 
         [Authorize(Policy = "AdminOrPremium")]
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteProduct(int id, int userId)
+        public async Task<ActionResult> DeleteProduct(int id, [FromQuery] int? userId)
         {
             var success = await _productService.DeleteProduct(id, userId);
             if (!success) return NotFound();
-            return NoContent();
+            return Ok(new { message = "Product deleted successfully" });
         }
     }
 }

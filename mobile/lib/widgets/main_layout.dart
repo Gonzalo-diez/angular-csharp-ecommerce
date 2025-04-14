@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'custom_navbar.dart';
-import 'custom_footer.dart';
-import 'custom_sidebar.dart'; // 👈 Importá el sidebar
+import 'package:mobile/widgets/custom_navbar.dart';
+import 'package:mobile/widgets/custom_footer.dart';
+import 'package:mobile/widgets/custom_sidebar.dart';
 
 class MainLayout extends StatelessWidget {
   final Widget child;

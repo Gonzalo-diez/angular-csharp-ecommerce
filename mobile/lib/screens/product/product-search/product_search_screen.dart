@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../models/product/product_model.dart';
-import '../../../services/product/product_service.dart';
+import 'package:mobile/models/product/product_model.dart';
+import 'package:mobile/services/product/product_service.dart';
 
 class ProductSearchScreen extends StatefulWidget {
   final String query;

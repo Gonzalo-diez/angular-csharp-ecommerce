@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../models/product/product_model.dart';
+import 'package:mobile/models/product/product_model.dart';
 
 class ProductService {
   static const String baseUrl = 'http://192.168.1.6:5180/api/product';
@@ -256,7 +256,7 @@ class ProductService {
     final prefs = await SharedPreferences.getInstance();
     final headers = await _getAuthHeaders();
     final userId = prefs.getInt('userId').toString();
-    final uri = Uri.parse('$baseUrl/id?userId=$userId');
+    final uri = Uri.parse('$baseUrl/$id?userId=$userId');
 
     try {
       final response = await http.delete(uri, headers: headers);

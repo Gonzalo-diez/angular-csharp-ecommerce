@@ -1,4 +1,4 @@
-import '../product/product_model.dart';
+import 'package:mobile/models/product/product_model.dart';
 
 class UserDto {
   final int? id;

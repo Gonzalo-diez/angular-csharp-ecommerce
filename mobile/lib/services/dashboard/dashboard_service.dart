@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../models/dashboard/dashboard_model.dart';
+import 'package:mobile/models/dashboard/dashboard_model.dart';
 
 class DashboardService with ChangeNotifier {
   static const String _baseUrl = 'http://192.168.1.6:5180/api/dashboard';

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:mobile/services/auth/auth_service.dart';
+import 'package:mobile/widgets/main_layout.dart';
 import 'package:mobile/models/product/product_model.dart';
 import 'package:mobile/screens/product/product-add/product_add_screen.dart';
 import 'package:mobile/screens/product/product-subcategory/product_subcategory_screen.dart';
-import 'package:provider/provider.dart';
-import 'services/auth/auth_service.dart';
-import 'widgets/main_layout.dart';
-import 'screens/product/product-list/product_list_screen.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/product/product-search/product_search_screen.dart';
-import 'screens/auth/register_screen.dart';
-import 'screens/dashboard/dashboard_screen.dart';
-import 'screens/cart/cart_screen.dart';
-import 'screens/product/product-category/product_category_screen.dart';
+import 'package:mobile/screens/product/product-list/product_list_screen.dart';
+import 'package:mobile/screens/auth/login_screen.dart';
+import 'package:mobile/screens/product/product-search/product_search_screen.dart';
+import 'package:mobile/screens/auth/register_screen.dart';
+import 'package:mobile/screens/dashboard/dashboard_screen.dart';
+import 'package:mobile/screens/cart/cart_screen.dart';
+import 'package:mobile/screens/product/product-category/product_category_screen.dart';
 
 void main() {
   runApp(

@@ -5,8 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import '../../models/auth/auth_model.dart';
-import '../../models/auth/auth_role.dart';
+import 'package:mobile/models/auth/auth_model.dart';
+import 'package:mobile/models/auth/auth_role.dart';
 
 class AuthService with ChangeNotifier {
   static const String _baseUrl = 'http://192.168.1.6:5180/api/auth';
@@ -14,9 +14,16 @@ class AuthService with ChangeNotifier {
 
   bool _isAuthenticated = false;
   String? _token;
+  int? _userId;
+  String? _role;
 
   bool get isAuthenticated => _isAuthenticated;
   String? get token => _token;
+  int? get userId => _userId;
+  String? get role => _role;
+
+  bool get isAdmin => _role == 'admin';
+  bool get isPremium => _role == 'premium';
 
   AuthService() {
     _loadToken();
@@ -25,6 +32,8 @@ class AuthService with ChangeNotifier {
   Future<void> _loadToken() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
+    _userId = prefs.getInt('userId');
+    _role = prefs.getString('role');
     _isAuthenticated = _token != null;
     notifyListeners();
   }
@@ -85,14 +94,16 @@ class AuthService with ChangeNotifier {
         }
 
         if (userId != null) {
+          _userId = userId;
           await prefs.setInt('userId', userId);
           logger.i('🆔 userId guardado: $userId');
         } else {
           logger.w('⚠️ userId no encontrado o inválido');
         }
 
+        _role = user.role.name;
+        await prefs.setString('role', _role!);
         await prefs.setString('token', _token!);
-        await prefs.setString('role', user.role.name);
 
         _isAuthenticated = true;
         notifyListeners();
@@ -152,7 +163,9 @@ class AuthService with ChangeNotifier {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
+    await prefs.remove('userId');
     _token = null;
+    _userId = null;
     _isAuthenticated = false;
     notifyListeners();
   }

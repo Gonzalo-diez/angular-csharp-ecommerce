@@ -1,6 +1,6 @@
 import 'checkout_request_model.dart';
 import 'invoice_detail_model.dart';
-import '../auth/auth_model.dart';
+import 'package:mobile/models/auth/auth_model.dart';
 
 class InvoiceModel {
   final int id;

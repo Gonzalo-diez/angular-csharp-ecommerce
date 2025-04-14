@@ -1,5 +1,4 @@
-import '../product/product_model.dart'; // Asegurate de tener definido ProductModel
-// import 'invoice_model.dart'; // Opcional, si necesitas el objeto completo
+import 'package:mobile/models/product/product_model.dart';
 
 class InvoiceDetailModel {
   final int id;

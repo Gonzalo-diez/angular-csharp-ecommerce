@@ -1,5 +1,5 @@
-import '../product/product_model.dart';
-import 'cart_model.dart';
+import 'package:mobile/models/product/product_model.dart';
+import 'package:mobile/models/cart/cart_model.dart';
 
 class CartItemModel {
   final int id;

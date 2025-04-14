@@ -1,4 +1,4 @@
-import 'auth_role.dart';
+import 'package:mobile/models/auth/auth_role.dart';
 
 class AuthModel {
   final int id;
@@ -7,8 +7,8 @@ class AuthModel {
   final String email;
   final String password;
   final AuthRole role;
-  final dynamic products; // o List<Product>? si los modelás después
-  final dynamic purchases; // o List<Purchase>? si los modelás después
+  final dynamic products;
+  final dynamic purchases;
 
   AuthModel({
     required this.id,
@@ -26,11 +26,11 @@ class AuthModel {
     firstName: json['firstName'] ?? json['FirstName'],
     lastName: json['lastName'] ?? json['LastName'],
     email: json['email'] ?? json['Email'],
-    password: json['password'] ?? '', // porque no viene en el token
+    password: json['password'] ?? '',
     role: json['role'] != null
     ? AuthRole.values.firstWhere(
         (r) => r.name == json['role'],
-        orElse: () => AuthRole.user, // valor por defecto si no coincide
+        orElse: () => AuthRole.user,
       )
     : authRoleMap[json['Role']] ?? AuthRole.user,
     products: json['products'],

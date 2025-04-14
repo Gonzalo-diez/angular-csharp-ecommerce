@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../models/cart/cart_model.dart';
-import '../../models/invoice/invoice_model.dart';
-import '../../models/purchase/purchase_model.dart';
-import '../../models/invoice/checkout_request_model.dart';
+import 'package:mobile/models/cart/cart_model.dart';
+import 'package:mobile/models/invoice/invoice_model.dart';
+import 'package:mobile/models/purchase/purchase_model.dart';
+import 'package:mobile/models/invoice/checkout_request_model.dart';
 
 class CartService {
   final String baseUrl = 'http://192.168.1.6:5180/api/cart';

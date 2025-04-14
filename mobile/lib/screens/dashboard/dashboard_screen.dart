@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../services/dashboard/dashboard_service.dart';
-import '../../models/dashboard/dashboard_model.dart';
+import 'package:mobile/services/dashboard/dashboard_service.dart';
+import 'package:mobile/models/dashboard/dashboard_model.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

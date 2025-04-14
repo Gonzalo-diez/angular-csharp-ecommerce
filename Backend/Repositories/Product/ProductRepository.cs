@@ -133,7 +133,7 @@ namespace Backend.Repositories
             return product;
         }
 
-        public async Task<bool?> UpdateProduct(int id, Product updatedProduct, int userId)
+        public async Task<bool?> UpdateProduct(int id, Product updatedProduct, int? userId)
         {
             var product = await GetProductById(id);
             if (product == null || product.OwnerId != userId)
@@ -171,7 +171,7 @@ namespace Backend.Repositories
             return true;
         }
 
-        public async Task<bool> DeleteProduct(int id, int userId)
+        public async Task<bool> DeleteProduct(int id, int? userId)
         {
             var product = await GetProductById(id);
             if (product == null || (product.OwnerId != userId))
