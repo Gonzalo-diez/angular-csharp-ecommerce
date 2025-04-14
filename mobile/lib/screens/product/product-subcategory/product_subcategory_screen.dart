@@ -21,7 +21,13 @@ class _ProductSubcategoryScreenState extends State<ProductSubcategoryScreen> {
   final ProductService _productService = ProductService();
   late Future<List<ProductModel>> _productsFuture;
 
+  double? _minPrice;
+  double? _maxPrice;
+  ProductStatus? _status;
   String? _errorMessage;
+
+  final _minPriceController = TextEditingController();
+  final _maxPriceController = TextEditingController();
 
   @override
   void initState() {
@@ -34,6 +40,9 @@ class _ProductSubcategoryScreenState extends State<ProductSubcategoryScreen> {
       final products = await _productService.getProductsBySubcategory(
         category: widget.category.name,
         subCategory: widget.subCategory.name,
+        minPrice: _minPrice,
+        maxPrice: _maxPrice,
+        status: _status,
       );
       return products;
     } catch (e) {
@@ -51,40 +60,120 @@ class _ProductSubcategoryScreenState extends State<ProductSubcategoryScreen> {
     }
   }
 
+  void _applyFilters() {
+    setState(() {
+      _minPrice = double.tryParse(_minPriceController.text);
+      _maxPrice = double.tryParse(_maxPriceController.text);
+      _productsFuture = _loadProducts();
+    });
+  }
+
+  @override
+  void dispose() {
+    _minPriceController.dispose();
+    _maxPriceController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(_getSubcategoryTitle(widget.subCategory))),
-      body:
-          _errorMessage != null
-              ? Center(child: Text(_errorMessage!, textAlign: TextAlign.center))
-              : FutureBuilder<List<ProductModel>>(
-                future: _productsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+      body: Column(
+        children: [
+          _buildFilters(),
+          Expanded(
+            child:
+                _errorMessage != null
+                    ? Center(
+                      child: Text(_errorMessage!, textAlign: TextAlign.center),
+                    )
+                    : FutureBuilder<List<ProductModel>>(
+                      future: _productsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
 
-                  final products = snapshot.data ?? [];
+                        final products = snapshot.data ?? [];
 
-                  if (products.isEmpty) {
-                    return Center(
-                      child: Text(
-                        'No hay productos disponibles.',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    );
-                  }
+                        if (products.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              'No hay productos disponibles.',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          );
+                        }
 
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(12),
-                    itemCount: products.length,
-                    itemBuilder:
-                        (context, index) =>
-                            _buildProductItem(context, products[index]),
-                  );
-                },
+                        return ListView.builder(
+                          padding: const EdgeInsets.all(12),
+                          itemCount: products.length,
+                          itemBuilder:
+                              (context, index) =>
+                                  _buildProductItem(context, products[index]),
+                        );
+                      },
+                    ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilters() {
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _minPriceController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Precio mínimo'),
+                ),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: _maxPriceController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Precio máximo'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          DropdownButton<ProductStatus>(
+            value: _status,
+            hint: const Text('Filtrar por estado'),
+            isExpanded: true,
+            items:
+                ProductStatus.values.map((ProductStatus status) {
+                  return DropdownMenuItem<ProductStatus>(
+                    value: status,
+                    child: Text(status.name.toUpperCase()),
+                  );
+                }).toList(),
+            onChanged: (ProductStatus? newValue) {
+              setState(() {
+                _status = newValue;
+              });
+            },
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton.icon(
+            onPressed: _applyFilters,
+            icon: const Icon(Icons.filter_alt),
+            label: const Text('Aplicar filtros'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -115,7 +204,7 @@ class _ProductSubcategoryScreenState extends State<ProductSubcategoryScreen> {
         ),
         trailing: Text('Stock: ${product.stock}'),
         onTap: () {
-          // Lógica para ver detalle del producto
+          // Acción al tocar el producto
         },
       ),
     );

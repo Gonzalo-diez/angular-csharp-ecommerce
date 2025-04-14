@@ -16,6 +16,13 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
   late Future<List<ProductModel>> _productsFuture;
 
   String? _errorMessage;
+  double? _minPrice;
+  double? _maxPrice;
+  ProductSubCategory? _selectedSubCategoryEnum;
+  ProductStatus? _selectedStatusEnum;
+
+  final TextEditingController _minPriceController = TextEditingController();
+  final TextEditingController _maxPriceController = TextEditingController();
 
   @override
   void initState() {
@@ -27,9 +34,12 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
     try {
       return await _productService.getProductsByCategory(
         category: widget.category.name,
+        minPrice: _minPrice,
+        maxPrice: _maxPrice,
+        subCategory: _selectedSubCategoryEnum,
+        status: _selectedStatusEnum,
       );
     } catch (e) {
-      // Comprobar si el error es un 404
       if (e.toString().contains('404')) {
         setState(() {
           _errorMessage =
@@ -44,40 +54,152 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
     }
   }
 
+  void _applyFilters() {
+    setState(() {
+      _minPrice = double.tryParse(_minPriceController.text);
+      _maxPrice = double.tryParse(_maxPriceController.text);
+      _productsFuture = _loadProducts();
+    });
+  }
+
+  void _clearFilters() {
+    setState(() {
+      _minPriceController.clear();
+      _maxPriceController.clear();
+      _minPrice = null;
+      _maxPrice = null;
+      _selectedSubCategoryEnum = null;
+      _selectedStatusEnum = null;
+      _productsFuture = _loadProducts();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(_getCategoryTitle(widget.category))),
-      body:
-          _errorMessage != null
-              ? Center(child: Text(_errorMessage!, textAlign: TextAlign.center))
-              : FutureBuilder<List<ProductModel>>(
-                future: _productsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  final products = snapshot.data ?? [];
-
-                  if (products.isEmpty) {
-                    return Center(
-                      child: Text(
-                        'No hay productos disponibles.',
-                        style: const TextStyle(fontSize: 16),
+      body: Column(
+        children: [
+          // FILTROS
+          ExpansionTile(
+            title: const Text('Filtros'),
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _minPriceController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Precio mínimo',
                       ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(12),
-                    itemCount: products.length,
-                    itemBuilder:
-                        (context, index) =>
-                            _buildProductItem(context, products[index]),
-                  );
-                },
+                    ),
+                    TextField(
+                      controller: _maxPriceController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Precio máximo',
+                      ),
+                    ),
+                    DropdownButton<ProductSubCategory>(
+                      value: _selectedSubCategoryEnum,
+                      hint: const Text('Subcategoría'),
+                      isExpanded: true,
+                      items:
+                          ProductSubCategory.values.map((sub) {
+                            return DropdownMenuItem(
+                              value: sub,
+                              child: Text(sub.name),
+                            );
+                          }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedSubCategoryEnum = value;
+                        });
+                      },
+                    ),
+                    DropdownButton<ProductStatus>(
+                      value: _selectedStatusEnum,
+                      hint: const Text('Estado'),
+                      isExpanded: true,
+                      items:
+                          ProductStatus.values.map((status) {
+                            return DropdownMenuItem(
+                              value: status,
+                              child: Text(status.name),
+                            );
+                          }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedStatusEnum = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _applyFilters,
+                            child: const Text('Aplicar filtros'),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: _clearFilters,
+                            child: const Text('Limpiar'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
+            ],
+          ),
+
+          // RESULTADOS
+          Expanded(
+            child:
+                _errorMessage != null
+                    ? Center(
+                      child: Text(_errorMessage!, textAlign: TextAlign.center),
+                    )
+                    : FutureBuilder<List<ProductModel>>(
+                      future: _productsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        final products = snapshot.data ?? [];
+
+                        if (products.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              'No hay productos disponibles.',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          padding: const EdgeInsets.all(12),
+                          itemCount: products.length,
+                          itemBuilder:
+                              (context, index) =>
+                                  _buildProductItem(context, products[index]),
+                        );
+                      },
+                    ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -107,9 +229,7 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
           '${product.brand} - \$${product.price.toStringAsFixed(2)}',
         ),
         trailing: Text('Stock: ${product.stock}'),
-        onTap: () {
-          // Detalle producto
-        },
+        onTap: () {},
       ),
     );
   }
