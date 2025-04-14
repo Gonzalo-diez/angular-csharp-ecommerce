@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'custom_navbar.dart';
 import 'custom_footer.dart';
+import 'custom_sidebar.dart'; // 👈 Importá el sidebar
 
 class MainLayout extends StatelessWidget {
   final Widget child;
@@ -21,6 +22,7 @@ class MainLayout extends StatelessWidget {
     final searchController = TextEditingController();
 
     return Scaffold(
+      drawer: const CustomSidebar(), // 👈 Agregá el sidebar acá
       appBar:
           showSearchBar
               ? CustomNavBar(

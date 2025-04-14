@@ -27,14 +27,13 @@ class ProductService {
       if (subCategory != null) queryParams['productSubCategory'] = subCategory.name;
       if (status != null) queryParams['status'] = status.name;
 
-      final uri = Uri.parse(
-        '$baseUrl/',
-      ).replace(queryParameters: queryParams);
+      final uri = Uri.parse('$baseUrl/').replace(queryParameters: queryParams);
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         final List<dynamic> body = jsonDecode(response.body);
-        final products = body.map((json) => ProductModel.fromJson(json)).toList();
+        final products =
+            body.map((json) => ProductModel.fromJson(json)).toList();
         _logger.i('✅ Productos recibidos del backend (${products.length})');
         return products;
       } else {
@@ -63,6 +62,73 @@ class ProductService {
       }
     } catch (error) {
       _logger.e('❌ Error en searchProducts', error: error);
+      rethrow;
+    }
+  }
+
+  // Obtener todos los productos de una categoria
+  Future<List<ProductModel>> getProductsByCategory({
+    double? minPrice,
+    double? maxPrice,
+    String? category,
+    ProductSubCategory? subCategory,
+    ProductStatus? status,
+  }) async {
+    try {
+      Map<String, String> queryParams = {};
+      if (minPrice != null) queryParams['minPrice'] = minPrice.toString();
+      if (maxPrice != null) queryParams['maxPrice'] = maxPrice.toString();
+      if (subCategory != null) queryParams['productSubCategory'] = subCategory.name;
+      if (status != null) queryParams['status'] = status.name;
+
+      final uri = Uri.parse('$baseUrl/category/$category').replace(queryParameters: queryParams);
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> body = jsonDecode(response.body);
+        final products =
+            body.map((json) => ProductModel.fromJson(json)).toList();
+        _logger.i('✅ Productos recibidos del backend (${products.length})');
+        return products;
+      } else {
+        _logger.w('⚠️ Error al obtener productos: ${response.statusCode}');
+        throw Exception('Error loading products: ${response.statusCode}');
+      }
+    } catch (error) {
+      _logger.e('❌ Error en getProductsByCategory', error: error);
+      rethrow;
+    }
+  }
+
+  // Obtener todos los productos de una subcategoria
+  Future<List<ProductModel>> getProductsBySubcategory({
+    double? minPrice,
+    double? maxPrice,
+    String? category,
+    String? subCategory,
+    ProductStatus? status,
+  }) async {
+    try {
+      Map<String, String> queryParams = {};
+      if (minPrice != null) queryParams['minPrice'] = minPrice.toString();
+      if (maxPrice != null) queryParams['maxPrice'] = maxPrice.toString();
+      if (status != null) queryParams['status'] = status.name;
+
+      final uri = Uri.parse('$baseUrl/category/$category/subcategory/$subCategory').replace(queryParameters: queryParams);
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> body = jsonDecode(response.body);
+        final products =
+            body.map((json) => ProductModel.fromJson(json)).toList();
+        _logger.i('✅ Productos recibidos del backend (${products.length})');
+        return products;
+      } else {
+        _logger.w('⚠️ Error al obtener productos: ${response.statusCode}');
+        throw Exception('Error loading products: ${response.statusCode}');
+      }
+    } catch (error) {
+      _logger.e('❌ Error en getProductsBySubcategory', error: error);
       rethrow;
     }
   }

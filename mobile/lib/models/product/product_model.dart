@@ -1,3 +1,5 @@
+import 'package:mobile/models/auth/auth_model.dart';
+
 enum ProductCategory { technology, clothing, home }
 
 extension ProductCategoryExtension on ProductCategory {
@@ -51,6 +53,7 @@ class ProductModel {
   final ProductSubCategory subCategory;
   final ProductStatus status;
   final int? ownerId;
+  final AuthModel? owner;
   final String? imageUrl;
 
   @override
@@ -68,6 +71,7 @@ class ProductModel {
     required this.subCategory,
     required this.status,
     this.ownerId,
+    this.owner,
     this.imageUrl,
   });
 
@@ -84,7 +88,8 @@ class ProductModel {
       category: ProductCategoryExtension.fromString(json['category'].toString()),
       subCategory: ProductSubCategoryExtension.fromString(json['subCategory'].toString()),
       status: ProductStatusExtension.fromString(json['status'].toString()),
-      ownerId: json['ownerId'],
+      ownerId: json['ownerId'] != null ? int.parse(json['ownerId'].toString()) : null,
+      owner: json['owner'] != null ? AuthModel.fromJson(json['owner']) : null,
       imageUrl: json['imageUrl']?.toString(),
     );
   }
@@ -100,6 +105,7 @@ class ProductModel {
       'subCategory': subCategory.index,
       'status': status.index,
       'ownerId': ownerId,
+      'owner': owner?.toJson(),
       'imageUrl': imageUrl,
     };
   }

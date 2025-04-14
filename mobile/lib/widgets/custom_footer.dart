@@ -16,31 +16,37 @@ class CustomFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthService>(context);
 
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: (index) async {
-        if (auth.isAuthenticated && index == 1) {
-          // El usuario tocó "Logout"
-          await auth.logout();
-
-          // Navegar a pantalla de login (ajustá el route según tu app)
-          if (context.mounted) {
-            Navigator.pushReplacementNamed(context, '/auth/login');
-          }
-        } else {
-          onTap(index); // Usar la lógica normal del tap
-        }
-      },
-      items: [
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Inicio',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(auth.isAuthenticated ? Icons.logout : Icons.person),
-          label: auth.isAuthenticated ? 'Logout' : 'Login',
-        ),
-      ],
+    return Builder(
+      builder:
+          (context) => BottomNavigationBar(
+            currentIndex: currentIndex,
+            onTap: (index) async {
+              if (index == 2) {
+                Scaffold.of(context).openDrawer(); // 👈 Abre el sidebar
+              } else if (auth.isAuthenticated && index == 1) {
+                await auth.logout();
+                if (context.mounted) {
+                  Navigator.pushReplacementNamed(context, '/auth/login');
+                }
+              } else {
+                onTap(index);
+              }
+            },
+            items: [
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Inicio',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(auth.isAuthenticated ? Icons.logout : Icons.person),
+                label: auth.isAuthenticated ? 'Logout' : 'Login',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.menu),
+                label: 'Más',
+              ),
+            ],
+          ),
     );
   }
 }

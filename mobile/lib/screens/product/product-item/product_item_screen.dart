@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/product/product_model.dart';
 import '../../../services/product/product_service.dart';
+import '../../../services/cart/cart_service.dart';
 
 class ProductItemScreen extends StatefulWidget {
   final String productId;
@@ -13,11 +14,19 @@ class ProductItemScreen extends StatefulWidget {
 
 class _ProductItemScreenState extends State<ProductItemScreen> {
   late Future<ProductModel> _product;
+  int _quantity = 1;
+  final _cartService = CartService();
 
   @override
   void initState() {
     super.initState();
     _product = ProductService().getProductById(int.parse(widget.productId));
+  }
+
+  void _showSnackBar(String message, {Color color = Colors.green}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: color),
+    );
   }
 
   @override
@@ -41,6 +50,7 @@ class _ProductItemScreenState extends State<ProductItemScreen> {
           }
 
           final product = snapshot.data!;
+          final stock = product.stock;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -93,11 +103,43 @@ class _ProductItemScreenState extends State<ProductItemScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Botón para agregar al carrito (puedes personalizar esto)
+                // Selector de cantidad
+                Row(
+                  children: [
+                    const Text('Cantidad: ', style: TextStyle(fontSize: 16)),
+                    IconButton(
+                      icon: const Icon(Icons.remove),
+                      onPressed: _quantity > 1
+                          ? () => setState(() => _quantity--)
+                          : null,
+                    ),
+                    Text('$_quantity', style: const TextStyle(fontSize: 16)),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: _quantity < stock
+                          ? () => setState(() => _quantity++)
+                          : null,
+                    ),
+                    Text('(Stock: $stock)'),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Botón para agregar al carrito
                 ElevatedButton.icon(
-                  onPressed: () {
-                    // Lógica para agregar al carrito
-                  },
+                  onPressed: stock > 0
+                      ? () async {
+                          try {
+                            await _cartService.addProductToCart(
+                              product.id,
+                              _quantity,
+                            );
+                            _showSnackBar('✅ Producto agregado al carrito');
+                          } catch (e) {
+                            _showSnackBar('❌ Error al agregar al carrito', color: Colors.red);
+                          }
+                        }
+                      : null,
                   icon: const Icon(Icons.add_shopping_cart),
                   label: const Text('Agregar al carrito'),
                   style: ElevatedButton.styleFrom(

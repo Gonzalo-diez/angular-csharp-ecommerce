@@ -27,10 +27,12 @@ class AuthModel {
     lastName: json['lastName'] ?? json['LastName'],
     email: json['email'] ?? json['Email'],
     password: json['password'] ?? '', // porque no viene en el token
-    role:
-        json['role'] != null
-            ? AuthRole.values.firstWhere((r) => r.name == json['role'])
-            : authRoleMap[json['Role']]!,
+    role: json['role'] != null
+    ? AuthRole.values.firstWhere(
+        (r) => r.name == json['role'],
+        orElse: () => AuthRole.user, // valor por defecto si no coincide
+      )
+    : authRoleMap[json['Role']] ?? AuthRole.user,
     products: json['products'],
     purchases: json['purchases'],
   );

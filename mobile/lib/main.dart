@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/models/product/product_model.dart';
+import 'package:mobile/screens/product/product-subcategory/product_subcategory_screen.dart';
 import 'package:provider/provider.dart';
 import 'services/auth/auth_service.dart';
 import 'widgets/main_layout.dart';
@@ -8,6 +10,7 @@ import 'screens/product/product-search/product_search_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'screens/cart/cart_screen.dart';
+import 'screens/product/product-category/product_category_screen.dart';
 
 void main() {
   runApp(
@@ -55,6 +58,34 @@ class _MyAppState extends State<MyApp> {
         '/auth/register': (context) => const RegisterScreen(),
         '/dashboard': (context) => const DashboardScreen(),
         '/cart': (context) => const CartScreen(),
+        '/category': (context) {
+          final args =
+              ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+
+          // Convertir el String a enum ProductCategory
+          final categoryString = args['category']!;
+          final category = ProductCategory.values.firstWhere(
+            (e) => e.name.toLowerCase() == categoryString.toLowerCase(),
+            orElse: () => ProductCategory.technology, // valor por defecto
+          );
+
+          return ProductCategoryScreen(category: category);
+        },
+        '/subcategory': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+          final categoryString = args['category']!;
+          final category = ProductCategory.values.firstWhere(
+            (e) => e.name.toLowerCase() == categoryString.toLowerCase(),
+            orElse: () => ProductCategory.technology, // valor por defecto
+          );
+          final subcategoryString = args['subcategory']!;
+          final subcategory = ProductSubCategory.values.firstWhere(
+            (e) => e.name.toLowerCase() == subcategoryString.toLowerCase(), 
+            orElse: () => ProductSubCategory.console
+          );
+
+          return ProductSubcategoryScreen(category: category, subCategory: subcategory);
+        },
         '/home':
             (context) => MainLayout(
               currentIndex: 0,
