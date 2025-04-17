@@ -11,19 +11,26 @@ namespace Backend.Services
     {
         private readonly string _stripeSecretKey;
         private readonly string _mercadoPagoAccessToken;
+        private readonly string _webUrl;
+        private readonly string _mobileUrl;
 
         public PaymentService(IConfiguration configuration)
         {
             _stripeSecretKey = configuration["Stripe:SecretKey"] ?? throw new Exception("Stripe secret key is not set.");
             _mercadoPagoAccessToken = configuration["MercadoPago:AccessToken"] ?? throw new Exception("The Mercado Pago Access Token is not configured.");
 
+            _webUrl = configuration["Frontend:WebUrl"]!;
+            _mobileUrl = configuration["Mobile:MobileUrl"]!;
+
             // Configurar Stripe API Key una vez en el constructor
             StripeConfiguration.ApiKey = _stripeSecretKey;
         }
 
         // 🔹 Método para Stripe
-        public async Task<string> CreateStripePaymentSessionAsync(List<CartItem> cartItems)
+        public async Task<string> CreateStripePaymentSessionAsync(List<CartItem> cartItems, bool isMobileClient = false)
         {
+            var baseUrl = isMobileClient ? _mobileUrl : _webUrl;
+
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
@@ -41,8 +48,8 @@ namespace Backend.Services
                     Quantity = item.Quantity,
                 }).ToList(),
                 Mode = "payment",
-                SuccessUrl = "http://localhost:5169/success?session_id={CHECKOUT_SESSION_ID}",
-                CancelUrl = "http://localhost:5169/cancel",
+                SuccessUrl = $"{baseUrl}/success?session_id={{CHECKOUT_SESSION_ID}}",
+                CancelUrl = $"{baseUrl}/cancel",
             };
 
             var service = new SessionService();
@@ -51,7 +58,7 @@ namespace Backend.Services
         }
 
         // 🔹 Método para Mercado Pago
-        public async Task<string> CreateMercadoPagoPreferenceAsync(List<CartItem> cartItems)
+        public async Task<string> CreateMercadoPagoPreferenceAsync(List<CartItem> cartItems, bool isMobileClient = false)
         {
             if (cartItems == null || !cartItems.Any())
             {
@@ -59,22 +66,23 @@ namespace Backend.Services
             }
 
             MercadoPago.Config.MercadoPagoConfig.AccessToken = _mercadoPagoAccessToken;
+            var baseUrl = isMobileClient ? _mobileUrl : _webUrl;
 
             var client = new PreferenceClient();
             var preferenceRequest = new PreferenceRequest
             {
                 Items = cartItems.Select(item => new PreferenceItemRequest
                 {
-                    Title = item.Product.Name,  // Esto debería mapearse correctamente de la interfaz
+                    Title = item.Product.Name,
                     Quantity = item.Quantity,
-                    CurrencyId = "ARS",  // Moneda en pesos argentinos
-                    UnitPrice = item.Product.Price  // Esto debería mapearse correctamente de la interfaz
+                    CurrencyId = "ARS",
+                    UnitPrice = item.Product.Price
                 }).ToList(),
                 BackUrls = new PreferenceBackUrlsRequest
                 {
-                    Success = "http://localhost:5169/success",
-                    Failure = "http://localhost:5169/failure",
-                    Pending = "http://localhost:5169/pending"
+                    Success = $"{baseUrl}/success",
+                    Failure = $"{baseUrl}/failure",
+                    Pending = $"{baseUrl}/pending"
                 },
                 AutoReturn = "approved",
             };

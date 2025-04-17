@@ -16,6 +16,9 @@ export class ShippingFormComponent {
 
   constructor(private fb: FormBuilder) {
     this.shippingForm = this.fb.group({
+      cardNumber: ['', Validators.required],
+      securityCode: ['', Validators.required],
+      expirationDate: ['', Validators.required],
       fullName: ['', Validators.required],
       address: ['', Validators.required],
       city: ['', Validators.required],

@@ -40,7 +40,7 @@ namespace Backend.Models
         public string SecurityCode { get; set; } = string.Empty;
 
         [Required]
-        public DateTime ExpirationDate { get; set; } = DateTime.UtcNow;
+        public DateTime ExpirationDate { get; set; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
 
         [Required]
         [MaxLength(50)]

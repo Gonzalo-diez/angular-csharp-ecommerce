@@ -72,6 +72,12 @@ namespace Backend.Controllers
                     return BadRequest(new { message = "Se requiere un userId válido." });
                 }
 
+                if (request?.ShippingData?.ExpirationDate != null)
+                {
+                    request.ShippingData.ExpirationDate = DateTime.SpecifyKind(
+                        request.ShippingData.ExpirationDate, DateTimeKind.Utc);
+                }
+
                 // Obtener el carrito del usuario
                 var cart = await _cartService.GetCartByUserIdAsync(userId);
                 if (cart == null || !cart.Items.Any())
@@ -120,7 +126,7 @@ namespace Backend.Controllers
                 var invoice = new Invoice
                 {
                     UserId = userId,
-                    CheckoutRequest = request,
+                    CheckoutRequest = request!,
                     Total = cart.Items.Sum(item => item.Product.Price * item.Quantity),
                     Details = cart.Items.Select(item => new InvoiceDetail
                     {
@@ -138,9 +144,10 @@ namespace Backend.Controllers
                 var pdfFile = File(pdfBytes, "application/pdf", $"factura{invoice.Id}.pdf");
 
                 // Si el método de pago es Stripe
-                if (request.PaymentMethod == "Stripe")
+                if (request!.PaymentMethod == "Stripe")
                 {
-                    var paymentSessionUrl = await _paymentService.CreateStripePaymentSessionAsync(cart.Items);
+                    var isMobile = Request.Headers["X-Client-Type"] == "Mobile";
+                    var paymentSessionUrl = await _paymentService.CreateStripePaymentSessionAsync(cart.Items, isMobile);
                     if (!string.IsNullOrEmpty(paymentSessionUrl))
                     {
                         await _cartService.ClearCartAsync(userId);
@@ -159,7 +166,8 @@ namespace Backend.Controllers
                 {
                     try
                     {
-                        var paymentUrl = await _paymentService.CreateMercadoPagoPreferenceAsync(cart.Items);
+                        var isMobile = Request.Headers["X-Client-Type"] == "Mobile";
+                        var paymentUrl = await _paymentService.CreateMercadoPagoPreferenceAsync(cart.Items, isMobile);
                         if (!string.IsNullOrEmpty(paymentUrl))
                         {
                             await _cartService.ClearCartAsync(userId);
