@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screens/cart/shipping-form/shipping_form_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile/services/auth/auth_service.dart';
 import 'package:mobile/widgets/main_layout.dart';
@@ -59,6 +60,7 @@ class _MyAppState extends State<MyApp> {
         '/auth/register': (context) => const RegisterScreen(),
         '/dashboard': (context) => const DashboardScreen(),
         '/cart': (context) => const CartScreen(),
+        '/checkout': (context) => const ShippingFormScreen(),
         '/category': (context) {
           final args =
               ModalRoute.of(context)!.settings.arguments as Map<String, String>;

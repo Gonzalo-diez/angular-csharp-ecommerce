@@ -1,6 +1,8 @@
 using Backend.Interfaces;
 using Backend.Models;
 using Backend.Repositories.Interfaces;
+using Backend.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Backend.Services
 {
@@ -12,11 +14,14 @@ namespace Backend.Services
 
         private readonly IEmailService _emailService;
 
-        public ProductService(IProductRepository productRepository, IAuthRepository authRepository, IEmailService emailService)
+        private readonly IHubContext<ProductHub> _productHub;
+
+        public ProductService(IProductRepository productRepository, IAuthRepository authRepository, IEmailService emailService, IHubContext<ProductHub> productHub)
         {
             _productRepository = productRepository;
             _authRepository = authRepository;
             _emailService = emailService;
+            _productHub = productHub;
         }
 
         public async Task<List<Product>> GetAllProducts(decimal? minPrice, decimal? maxPrice, ProductCategory? productCategory, ProductSubCategory? productSubCategory)
@@ -46,8 +51,13 @@ namespace Backend.Services
 
         public async Task<Product> AddProduct(Product product)
         {
-            return await _productRepository.AddProduct(product);
+            var createdProduct = await _productRepository.AddProduct(product);
+
+            await _productHub.Clients.All.SendAsync("ProductAdded", createdProduct);
+
+            return createdProduct;
         }
+
 
         public async Task<bool?> UpdateProduct(int id, Product updatedProduct, int? userId)
         {
@@ -56,8 +66,16 @@ namespace Backend.Services
                 updatedProduct.Status = ProductStatus.Out_Of_Stock;
             }
 
-            return await _productRepository.UpdateProduct(id, updatedProduct, userId);
+            var result = await _productRepository.UpdateProduct(id, updatedProduct, userId);
+
+            if (result == true)
+            {
+                await _productHub.Clients.All.SendAsync("ProductUpdated", updatedProduct);
+            }
+
+            return result;
         }
+
 
         public async Task<bool?> UpdateProductPurchase(int id, Product updatedProduct, int? userId)
         {
@@ -85,7 +103,14 @@ namespace Backend.Services
 
         public async Task<bool> DeleteProduct(int id, int? userId)
         {
-            return await _productRepository.DeleteProduct(id, userId);
+            var result = await _productRepository.DeleteProduct(id, userId);
+
+            if (result)
+            {
+                await _productHub.Clients.All.SendAsync("ProductDeleted", id);
+            }
+
+            return result;
         }
     }
 }

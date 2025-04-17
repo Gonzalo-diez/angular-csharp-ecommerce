@@ -32,9 +32,12 @@ export class CartComponent implements OnInit {
 
   // Datos del formulario de envío
   shippingData = {
+    cardNumber: '',
+    securityCode: '',
+    expirationDate: new Date('2025-08-31'),
     fullName: '',
-    address: '',
     city: '',
+    address: '',
     zipCode: '',
     phone: '',
   };

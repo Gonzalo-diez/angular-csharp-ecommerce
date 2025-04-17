@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile/services/auth/auth_service.dart';
+import 'package:mobile/services/hub/signal_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -27,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final success = await authService.login(
       emailController.text,
       passwordController.text,
-      context, // ahora le pasás el context
+      context,
     );
 
     setState(() => isLoading = false);
@@ -38,7 +39,19 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         errorMessage = 'Correo o contraseña incorrectos';
       });
+      return;
     }
+
+    // ✅ Si el login fue exitoso, inicializamos SignalService
+    final userId = authService.userId; // Asegurate de tener esto
+    if (userId != null) {
+      await SignalService().initConnections(userId.toString());
+    }
+
+    if (!context.mounted) return;
+
+    // ✅ Navegar al dashboard o home
+    Navigator.pushReplacementNamed(context, '/dashboard');
   }
 
   @override

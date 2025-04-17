@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/models/cart/cart_model.dart';
 import 'package:mobile/services/cart/cart_service.dart';
+import 'package:mobile/models/invoice/checkout_request_model.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -40,6 +41,27 @@ class _CartScreenState extends State<CartScreen> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> _goToShippingForm() async {
+    final result = await Navigator.pushNamed(context, '/checkout');
+
+    if (result != null && result is CheckoutRequestModel) {
+      // Acá hacés el request al backend para procesar el checkout
+      try {
+        await _cartService.checkout(result);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('¡Compra realizada con éxito!')),
+        );
+        _loadCart(); // refrescamos el carrito vacío
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al procesar la compra: $e')),
+        );
+      }
     }
   }
 
@@ -139,6 +161,20 @@ class _CartScreenState extends State<CartScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.end,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8,
+                    ),
+                    child: ElevatedButton.icon(
+                      onPressed: _goToShippingForm,
+                      icon: const Icon(Icons.payment),
+                      label: const Text('Comprar'),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                      ),
                     ),
                   ),
                 ],

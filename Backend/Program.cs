@@ -170,6 +170,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<Backend.Hubs.AuthHub>("/authHub");
 app.MapHub<Backend.Hubs.CartHub>("/cartHub");
+app.MapHub<Backend.Hubs.ProductHub>("/productHub");
 app.MapControllers();
 
 // ✅ Middleware para imprimir el token recibido (solo para depuración)

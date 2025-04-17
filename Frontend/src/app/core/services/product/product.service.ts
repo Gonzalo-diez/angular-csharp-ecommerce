@@ -42,12 +42,9 @@ export class ProductService {
   }
 
   // Obtener un producto por ID
-  getProductById(id: number, userId?: number): Observable<ProductModel> {
-    let params: any = {};
-    if (userId) params.userId = userId;
-
+  getProductById(id: number): Observable<ProductModel> {
     return this.http
-      .get<ProductModel>(`${this.apiUrl}/${id}`, { params })
+      .get<ProductModel>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 

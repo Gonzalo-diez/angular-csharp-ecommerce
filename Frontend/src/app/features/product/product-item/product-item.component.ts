@@ -17,8 +17,8 @@ export class ProductItemComponent implements OnInit {
   product: ProductModel | null = null;
   productId!: number;
   isAuth = false;
-  userId: number | null = null;
   quantity: number = 1;
+  userId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -30,13 +30,18 @@ export class ProductItemComponent implements OnInit {
 
   ngOnInit(): void {
     this.productId = Number(this.route.snapshot.paramMap.get('id'));
-    
-    // 🔥 Ahora `isAuthenticated()` devuelve un boolean directamente
+    console.log('📦 Product ID:', this.productId); // 🔍 Log del productId
+
     this.isAuth = this.authService.isAuthenticated();
 
     if (this.isAuth) {
       const token = this.authService.getToken();
-      this.userId = token ? this.decodeToken(token) : null;
+      console.log('🔑 Token:', token); // 🔍 Log del token
+
+      if (token) {
+        this.userId = this.decodeToken(token);
+        console.log('👤 User ID:', this.userId); // 🔍 Log del userId
+      }
     }
 
     if (this.productId) {
@@ -45,14 +50,12 @@ export class ProductItemComponent implements OnInit {
   }
 
   loadProductById(): void {
-    this.productService
-      .getProductById(this.productId, Number(this.userId))
-      .subscribe({
-        next: (data) => {
-          this.product = data;
-        },
-        error: (err) => console.error('Error loading product:', err),
-      });
+    this.productService.getProductById(this.productId).subscribe({
+      next: (data) => {
+        this.product = data;
+      },
+      error: (err) => console.error('Error loading product:', err),
+    });
   }
 
   addProductToCart() {
@@ -70,11 +73,18 @@ export class ProductItemComponent implements OnInit {
 
   private decodeToken(token: string): number | null {
     try {
-      const base64Url = token.split('.')[1];
+      const base64Url = token.split('.')[1]; // Extrae la parte del payload del JWT
       if (!base64Url) return null;
 
-      const payload = JSON.parse(atob(base64Url));
-      return payload?.user?.id ?? null; // 🔹 Asegura que se usa `.id` en lugar de `.Id`
+      const payload = JSON.parse(atob(base64Url)); // Decodifica el payload
+
+      // Verifica si existe la propiedad "user" y conviértela en objeto
+      const userData = payload.user ? JSON.parse(payload.user) : null;
+
+      // Extrae el ID si existe
+      const id = userData?.Id ?? null;
+
+      return id;
     } catch (e) {
       console.error('Error al decodificar el token:', e);
       return null;

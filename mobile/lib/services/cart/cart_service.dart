@@ -119,11 +119,23 @@ class CartService {
 
     final uri = Uri.parse('$baseUrl/checkout?userId=$userId');
 
+    logger.i('📤 Enviando solicitud de checkout');
+    logger.d('🧠 URI: $uri');
+    logger.d('🧠 Headers: $headers');
+    logger.d('🧠 Body: ${jsonEncode(request.toJson())}');
+
     final response = await http.post(
       uri,
       headers: headers,
-      body: jsonEncode(request.toJson()),
+      body: jsonEncode(
+        request.toJson(),
+      ),
     );
+
+    logger.i('✅ Respuesta recibida');
+    logger.d('🔢 Status code: ${response.statusCode}');
+    logger.d('📦 Body: ${response.body}');
+
     return _handleResponse<InvoiceModel>(
       response,
       (json) => InvoiceModel.fromJson(json),

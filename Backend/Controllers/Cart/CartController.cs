@@ -241,10 +241,4 @@ namespace Backend.Controllers
             }
         }
     }
-
-    public class AddItemRequest
-    {
-        public required int ProductId { get; set; }
-        public int Quantity { get; set; } = 1;
-    }
 }

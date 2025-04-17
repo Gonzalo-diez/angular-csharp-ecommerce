@@ -27,22 +27,31 @@ class CheckoutRequestModel {
 }
 
 class ShippingData {
+  final String cardNumber;
+  final String securityCode;
+  final DateTime expirationDate;
   final String fullName;
-  final String address;
   final String city;
+  final String address;
   final String zipCode;
   final String phone;
 
   ShippingData({
+    required this.cardNumber,
+    required this.securityCode,
+    required this.expirationDate,
     required this.fullName,
-    required this.address,
     required this.city,
+    required this.address,
     required this.zipCode,
     required this.phone,
   });
 
   factory ShippingData.fromJson(Map<String, dynamic> json) {
     return ShippingData(
+      cardNumber: json['cardNumber'],
+      securityCode: json['securityCode'],
+      expirationDate: DateTime.parse(json['expirationDate']),
       fullName: json['fullName'],
       address: json['address'],
       city: json['city'],
@@ -53,9 +62,12 @@ class ShippingData {
 
   Map<String, dynamic> toJson() {
     return {
+      'cardNumber': cardNumber,
+      'securityCode': securityCode,
+      'expirationDate': expirationDate.toIso8601String(),
       'fullName': fullName,
-      'address': address,
       'city': city,
+      'address': address,
       'zipCode': zipCode,
       'phone': phone,
     };

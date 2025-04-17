@@ -3,6 +3,34 @@
 
   <form [formGroup]="shippingForm" (ngSubmit)="submitForm()" class="space-y-4">
     <div>
+      <label class="block text-gray-700">Numero de tarjeta</label>
+      <input
+        type="text"
+        formControlName="cardNumber"
+        class="w-full px-3 py-2 border rounded"
+        placeholder="1234 5678 9012 3456"
+        maxlength="16"
+      />
+    </div>
+    <div>
+      <label class="block text-gray-700">Codigo de seguridad</label>
+      <input
+        type="text"
+        formControlName="securityName"
+        class="w-full px-3 py-2 border rounded"
+        placeholder="123"
+        maxlength="3"
+      />
+    </div>
+    <div>
+      <label class="block text-gray-700">Fecha de Expiración</label>
+      <input
+        type="month"
+        formControlName="expirationDate"
+        class="w-full px-3 py-2 border rounded"
+      />
+    </div>
+    <div>
       <label class="block text-gray-700">Nombre Completo</label>
       <input
         type="text"
@@ -12,21 +40,21 @@
       />
     </div>
     <div>
-      <label class="block text-gray-700">Dirección</label>
-      <input
-        type="text"
-        formControlName="address"
-        class="w-full px-3 py-2 border rounded"
-        placeholder="Calle y número"
-      />
-    </div>
-    <div>
       <label class="block text-gray-700">Ciudad</label>
       <input
         type="text"
         formControlName="city"
         class="w-full px-3 py-2 border rounded"
         placeholder="Ciudad"
+      />
+    </div>
+    <div>
+      <label class="block text-gray-700">Dirección</label>
+      <input
+        type="text"
+        formControlName="address"
+        class="w-full px-3 py-2 border rounded"
+        placeholder="Calle y número"
       />
     </div>
     <div>
