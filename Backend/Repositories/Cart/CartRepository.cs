@@ -12,16 +12,14 @@ public class CartRepository : ICartRepository
     }
 
     // Obtener el carrito de un usuario por su UserId
-    public async Task<Cart> GetCartByUserIdAsync(int? userId)
+    public async Task<Cart?> GetCartByUserIdAsync(int? userId)
     {
-        var cart = await _context.Carts
+        return await _context.Carts
             .Include(c => c.User)
             .Include(c => c.Items)
             .ThenInclude(ci => ci.Product)
-                .ThenInclude(p => p.Owner)
+            .ThenInclude(p => p.Owner)
             .FirstOrDefaultAsync(c => c.UserId == userId);
-
-        return cart ?? throw new Exception($"No se encontró un carrito para el usuario con ID {userId}.");
     }
 
     public async Task CreateAsync(Cart cart)

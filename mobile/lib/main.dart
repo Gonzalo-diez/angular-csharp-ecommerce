@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> {
           final categoryString = args['category']!;
           final category = ProductCategory.values.firstWhere(
             (e) => e.name.toLowerCase() == categoryString.toLowerCase(),
-            orElse: () => ProductCategory.technology, // valor por defecto
+            orElse: () => ProductCategory.technology,
           );
 
           return ProductCategoryScreen(category: category);
