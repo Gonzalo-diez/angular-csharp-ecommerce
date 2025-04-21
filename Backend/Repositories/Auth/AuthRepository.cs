@@ -58,5 +58,12 @@ namespace Backend.Repositories
 
             return user;
         }
+
+        public async Task UpdateAsync(Auth user)
+        {
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

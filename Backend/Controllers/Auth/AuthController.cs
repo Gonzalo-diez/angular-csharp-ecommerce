@@ -93,5 +93,46 @@ namespace Backend.Controllers
 
             return Ok(new { message = "User deleted successfully", user = deleteUser });
         }
+
+        [Authorize]
+        [HttpPost("upgrade")]
+        public async Task<IActionResult> UpgradeRole([FromQuery] int userId, [FromBody] UpgradeRequestDto upgradeRequest)
+        {
+            var user = await _authService.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "Usuario no encontrado" });
+            }
+
+            switch (upgradeRequest.PaymentMethod.ToLowerInvariant())
+            {
+                case "stripe":
+                    if (!await _authService.ConfirmStripePayment(upgradeRequest))
+                        return BadRequest(new { message = "Pago con Stripe fallido" });
+                    break;
+
+                case "mercadopago":
+                    if (!await _authService.ConfirmMercadoPagoPayment(upgradeRequest))
+                        return BadRequest(new { message = "Pago con MercadoPago fallido" });
+                    break;
+
+                default:
+                    return BadRequest(new { message = "Método de pago no soportado" });
+            }
+
+            // Actualiza el rol
+            var upgradedUser = await _authService.UpgradeUserToPremium(userId);
+
+            return Ok(new
+            {
+                message = "Upgrade a premium exitoso",
+                user = new
+                {
+                    upgradedUser.Id,
+                    upgradedUser.Email,
+                    upgradedUser.Role
+                }
+            });
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace Backend.Services
             StripeConfiguration.ApiKey = _stripeSecretKey;
         }
 
-        // 🔹 Método para Stripe
+        // 🔹 Método para las compras con Stripe
         public async Task<string> CreateStripePaymentSessionAsync(List<CartItem> cartItems, bool isMobileClient = false)
         {
             var baseUrl = isMobileClient ? _mobileUrl : _webUrl;
@@ -57,7 +57,7 @@ namespace Backend.Services
             return session.Url;
         }
 
-        // 🔹 Método para Mercado Pago
+        // 🔹 Método para las compras con Mercado Pago
         public async Task<string> CreateMercadoPagoPreferenceAsync(List<CartItem> cartItems, bool isMobileClient = false)
         {
             if (cartItems == null || !cartItems.Any())
@@ -97,5 +97,78 @@ namespace Backend.Services
                 throw new Exception("Error al crear la preferencia de MercadoPago.", ex);
             }
         }
+
+        public async Task<string> CreateStripeUpgradeSessionAsync(int userId, bool isMobileClient = false)
+        {
+            var baseUrl = isMobileClient ? _mobileUrl : _webUrl;
+
+            var options = new SessionCreateOptions
+            {
+                PaymentMethodTypes = new List<string> { "card" },
+                LineItems = new List<SessionLineItemOptions>
+        {
+            new SessionLineItemOptions
+            {
+                PriceData = new SessionLineItemPriceDataOptions
+                {
+                    Currency = "usd",
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
+                    {
+                        Name = "Premium Membership",
+                        Description = "Upgrade your account to Premium"
+                    },
+                    UnitAmount = 499 * 100, // $4.99
+                },
+                Quantity = 1,
+            }
+        },
+                Mode = "payment",
+                SuccessUrl = $"{baseUrl}/premium-success?userId={userId}",
+                CancelUrl = $"{baseUrl}/premium-cancel",
+            };
+
+            var service = new SessionService();
+            var session = await service.CreateAsync(options);
+            return session.Url;
+        }
+
+        public async Task<string> CreateMercadoPagoUpgradePreferenceAsync(int userId, bool isMobileClient = false)
+        {
+            MercadoPago.Config.MercadoPagoConfig.AccessToken = _mercadoPagoAccessToken;
+            var baseUrl = isMobileClient ? _mobileUrl : _webUrl;
+
+            var client = new PreferenceClient();
+            var preferenceRequest = new PreferenceRequest
+            {
+                Items = new List<PreferenceItemRequest>
+        {
+            new PreferenceItemRequest
+            {
+                Title = "Membresía Premium",
+                Quantity = 1,
+                CurrencyId = "ARS",
+                UnitPrice = 2999  // $2999 ARS
+            }
+        },
+                BackUrls = new PreferenceBackUrlsRequest
+                {
+                    Success = $"{baseUrl}/premium-success?userId={userId}",
+                    Failure = $"{baseUrl}/premium-failure",
+                    Pending = $"{baseUrl}/premium-pending"
+                },
+                AutoReturn = "approved",
+            };
+
+            try
+            {
+                Preference preference = await client.CreateAsync(preferenceRequest);
+                return preference.InitPoint;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al crear el pago de membresía premium con MercadoPago.", ex);
+            }
+        }
+
     }
 }

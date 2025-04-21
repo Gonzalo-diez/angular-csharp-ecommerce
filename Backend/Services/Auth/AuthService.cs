@@ -8,6 +8,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.SignalR;
 using Backend.Hubs;
+using Backend.Identity;
 
 namespace Backend.Services
 {
@@ -101,6 +102,37 @@ namespace Backend.Services
         {
             return await _authRepository.DeleteUserByIdAsync(userId);
         }
+
+        public async Task<bool> ConfirmStripePayment(UpgradeRequestDto upgradeRequest)
+        {
+            // Simula una validación o conectá con Stripe SDK real
+            // Podés agregar lógica para verificar el `upgradeRequest.StripeSessionId` por ejemplo
+            return await Task.FromResult(true); // o false si falla
+        }
+
+        public async Task<bool> ConfirmMercadoPagoPayment(UpgradeRequestDto upgradeRequest)
+        {
+            // Validación con MercadoPago si aplicás la integración
+            return await Task.FromResult(true);
+        }
+
+        public async Task<Auth> UpgradeUserToPremium(int userId)
+        {
+            var user = await _authRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                throw new Exception("Usuario no encontrado para upgrade.");
+            }
+
+            if (user.Role == AuthRole.Premium) {
+                throw new Exception("Este usuario ya es premium.");
+            }
+
+            user.Role = AuthRole.Premium; 
+            await _authRepository.UpdateAsync(user);
+            return user;
+        }
+
 
         private string GenerateJwtToken(Auth user)
         {

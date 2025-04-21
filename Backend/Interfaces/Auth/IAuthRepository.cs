@@ -9,5 +9,7 @@ namespace Backend.Repositories.Interfaces
         Task<Auth?> GetUserByIdAsync(int id);
         Task<bool> LogOutUserAsync(int? userId);
         Task<Auth?> DeleteUserByIdAsync(int userId);
+        Task UpdateAsync(Auth user);
+
     }
 }
