@@ -24,6 +24,9 @@ namespace Backend.Models
         public string Email { get; set; } = string.Empty;
 
         [Required]
+        public string? ImageAvatar { get; set; } = null!;
+
+        [Required]
         [Column(TypeName = "varchar(20)")]
         public AuthRole Role { get; set; } = AuthRole.User;
 

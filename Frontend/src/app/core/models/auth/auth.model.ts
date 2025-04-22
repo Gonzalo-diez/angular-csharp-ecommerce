@@ -8,5 +8,6 @@ export interface AuthModel {
     password: string;
     role: AuthRole;
     products?: null;
-    purchases: null; 
+    purchases: null;
+    imageAvatar: string;
 }

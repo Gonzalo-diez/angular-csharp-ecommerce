@@ -1,4 +1,4 @@
-import { Component, effect } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProductService } from '../../core/services/product/product.service';
@@ -21,6 +21,8 @@ export class NavbarComponent {
   isHomeOpen = false;
   isAuth = false;
   searchTerm = '';
+  user: any = null;
+  avatarMenuOpen = false;
 
   constructor(
     private productService: ProductService,
@@ -28,11 +30,6 @@ export class NavbarComponent {
     private signalService: SignalService,
     private router: Router
   ) {}
-
-  // ✅ Aquí sí se puede usar `effect`, porque estamos dentro del contexto de la clase
-  readonly authEffect = effect(() => {
-    this.isAuth = this.authService.authStatus(); // asumiendo que retorna un `signal<boolean>`
-  });
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -46,6 +43,10 @@ export class NavbarComponent {
     if (category === 'tech') this.isTechOpen = !this.isTechOpen;
     if (category === 'clothing') this.isClothingOpen = !this.isClothingOpen;
     if (category === 'home') this.isHomeOpen = !this.isHomeOpen;
+  }
+
+  toggleAvatarMenu() {
+    this.avatarMenuOpen = !this.avatarMenuOpen;
   }
 
   search() {

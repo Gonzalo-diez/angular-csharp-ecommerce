@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     // isAuthenticated() ya devuelve un booleano, por lo que no necesitamos suscribirse.
+    this.signalService.startConnections();
     this.isAuth = this.authService.isAuthenticated();
   }
 

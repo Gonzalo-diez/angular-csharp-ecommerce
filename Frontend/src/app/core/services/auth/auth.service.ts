@@ -21,8 +21,15 @@ export class AuthService {
     }
   }
 
-  register(firstName: string, lastName: string, email: string, password: string): Observable<AuthModel> {
-    return this.http.post<AuthModel>(`${this.apiUrl}/register`, { firstName, lastName, email, password });
+  register(firstName: string, lastName: string, email: string, password: string, image: File): Observable<AuthModel> {
+    const formData = new FormData();
+    formData.append('firstName', firstName);
+    formData.append('lastName', lastName);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('image', image);
+
+    return this.http.post<AuthModel>(`${this.apiUrl}/register`, formData);
   }
 
   login(email: string, password: string): Observable<AuthModel> {

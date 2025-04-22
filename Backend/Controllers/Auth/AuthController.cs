@@ -31,7 +31,7 @@ namespace Backend.Controllers
 
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromForm] RegisterDto registerDto, IFormFile image)
         {
             var user = new Auth
             {
@@ -39,6 +39,24 @@ namespace Backend.Controllers
                 LastName = registerDto.LastName,
                 Email = registerDto.Email
             };
+
+            if (image != null) {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/avatar");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(image.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await image.CopyToAsync(fileStream);
+                }
+
+                user.ImageAvatar = $"/avatar/{uniqueFileName}";
+            }
 
             var (createdUser, token) = await _authService.RegisterAsync(user, registerDto.Password);
 
