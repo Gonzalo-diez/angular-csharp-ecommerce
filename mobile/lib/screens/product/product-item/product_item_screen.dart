@@ -4,7 +4,7 @@ import 'package:mobile/services/product/product_service.dart';
 import 'package:mobile/services/cart/cart_service.dart';
 
 class ProductItemScreen extends StatefulWidget {
-  final String productId;
+  final int productId;
 
   const ProductItemScreen({super.key, required this.productId});
 
@@ -20,13 +20,13 @@ class _ProductItemScreenState extends State<ProductItemScreen> {
   @override
   void initState() {
     super.initState();
-    _product = ProductService().getProductById(int.parse(widget.productId));
+    _product = ProductService().getProductById(widget.productId);
   }
 
   void _showSnackBar(String message, {Color color = Colors.green}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: color),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
   }
 
   @override
@@ -109,16 +109,18 @@ class _ProductItemScreenState extends State<ProductItemScreen> {
                     const Text('Cantidad: ', style: TextStyle(fontSize: 16)),
                     IconButton(
                       icon: const Icon(Icons.remove),
-                      onPressed: _quantity > 1
-                          ? () => setState(() => _quantity--)
-                          : null,
+                      onPressed:
+                          _quantity > 1
+                              ? () => setState(() => _quantity--)
+                              : null,
                     ),
                     Text('$_quantity', style: const TextStyle(fontSize: 16)),
                     IconButton(
                       icon: const Icon(Icons.add),
-                      onPressed: _quantity < stock
-                          ? () => setState(() => _quantity++)
-                          : null,
+                      onPressed:
+                          _quantity < stock
+                              ? () => setState(() => _quantity++)
+                              : null,
                     ),
                     Text('(Stock: $stock)'),
                   ],
@@ -127,19 +129,23 @@ class _ProductItemScreenState extends State<ProductItemScreen> {
 
                 // Botón para agregar al carrito
                 ElevatedButton.icon(
-                  onPressed: stock > 0
-                      ? () async {
-                          try {
-                            await _cartService.addProductToCart(
+                  onPressed:
+                      stock > 0
+                          ? () async {
+                            final added = await _cartService.addProductToCart(
                               product.id,
                               _quantity,
                             );
-                            _showSnackBar('✅ Producto agregado al carrito');
-                          } catch (e) {
-                            _showSnackBar('❌ Error al agregar al carrito', color: Colors.red);
+                            if (added) {
+                              _showSnackBar('✅ Producto agregado al carrito');
+                            } else {
+                              _showSnackBar(
+                                '❌ Error al agregar al carrito',
+                                color: Colors.red,
+                              );
+                            }
                           }
-                        }
-                      : null,
+                          : null,
                   icon: const Icon(Icons.add_shopping_cart),
                   label: const Text('Agregar al carrito'),
                   style: ElevatedButton.styleFrom(

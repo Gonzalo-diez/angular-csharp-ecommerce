@@ -33,20 +33,27 @@ class CartService {
     );
   }
 
-  Future<CartModel> addProductToCart(int productId, int quantity) async {
+  Future<bool> addProductToCart(int productId, int quantity) async {
     final prefs = await SharedPreferences.getInstance();
     final headers = await _getAuthHeaders();
     final userId = prefs.getInt('userId')?.toString();
     final uri = Uri.parse('$baseUrl/add?userId=$userId');
+
     final response = await http.post(
       uri,
       headers: headers,
       body: jsonEncode({'productId': productId, 'quantity': quantity}),
     );
-    return _handleResponse<CartModel>(
-      response,
-      (json) => CartModel.fromJson(json),
-    );
+
+    logger.i('✅ Respuesta recibida');
+    logger.d('🔢 Status code: ${response.statusCode}');
+    logger.d('📦 Body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<CartModel> removeFromCart(int productId) async {
@@ -88,9 +95,7 @@ class CartService {
     final response = await http.post(
       uri,
       headers: headers,
-      body: jsonEncode(
-        request.toJson(),
-      ),
+      body: jsonEncode(request.toJson()),
     );
 
     logger.i('✅ Respuesta recibida');

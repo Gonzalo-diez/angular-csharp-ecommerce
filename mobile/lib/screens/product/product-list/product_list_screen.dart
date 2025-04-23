@@ -262,7 +262,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       MaterialPageRoute(
                         builder:
                             (_) => ProductItemScreen(
-                              productId: product.id.toString(),
+                              productId: product.id,
                             ),
                       ),
                     );
