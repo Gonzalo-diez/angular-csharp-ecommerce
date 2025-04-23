@@ -1,7 +1,6 @@
 import { Component, OnInit, PLATFORM_ID, Inject, effect } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
-import { ProductService } from '../../core/services/product/product.service';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { SignalService } from '../../core/services/signal/signal.service';
 import { FormsModule } from '@angular/forms';
@@ -25,7 +24,6 @@ export class NavbarComponent implements OnInit {
   avatarMenuOpen = false;
 
   constructor(
-    private productService: ProductService,
     private authService: AuthService,
     private signalService: SignalService,
     private router: Router,
@@ -95,6 +93,10 @@ export class NavbarComponent implements OnInit {
 
   login() {
     this.router.navigate(['/auth/login']);
+  }
+
+  upgradeRole() {
+    this.router.navigate(['/auth/upgradeRole']);
   }
 
   logout() {

@@ -171,6 +171,13 @@
         >
           Logout
         </button>
+        <button 
+          *ngIf="user.role == 0"
+          (click)="upgradeRole()"
+          class="block w-full text-left px-4 py-2 hover:bg-gray-700"
+        >
+          Upgrade role
+        </button>
       </div>
     </li>
 
@@ -235,7 +242,6 @@
   <ul class="space-y-4">
     <li><a routerLink="/" class="block hover:text-gray-400">Home</a></li>
 
-    
     <!-- Dropdown en Sidebar  -->
     <li>
       <button
@@ -253,10 +259,26 @@
             Technology ▼
           </button>
           <ul *ngIf="isTechOpen" class="ml-4 space-y-2">
-            <li><a href="/product/category/Technology/subcategory/Console" class="block hover:text-gray-400">Consoles</a></li>
-            <li><a href="/product/category/Technology/subcategory/PC" class="block hover:text-gray-400">PC</a></li>
             <li>
-              <a href="/product/category/Technology/subcategory/Smartphone" class="block hover:text-gray-400">Smartphone</a>
+              <a
+                href="/product/category/Technology/subcategory/Console"
+                class="block hover:text-gray-400"
+                >Consoles</a
+              >
+            </li>
+            <li>
+              <a
+                href="/product/category/Technology/subcategory/PC"
+                class="block hover:text-gray-400"
+                >PC</a
+              >
+            </li>
+            <li>
+              <a
+                href="/product/category/Technology/subcategory/Smartphone"
+                class="block hover:text-gray-400"
+                >Smartphone</a
+              >
             </li>
           </ul>
         </li>
@@ -268,9 +290,27 @@
             Clothing ▼
           </button>
           <ul *ngIf="isClothingOpen" class="ml-4 space-y-2">
-            <li><a href="/product/category/Clothing/subcategory/Men" class="block hover:text-gray-400">Men</a></li>
-            <li><a href="/product/category/Clothing/subcategory/Women" class="block hover:text-gray-400">Women</a></li>
-            <li><a href="/product/category/Clothing/subcategory/Kids" class="block hover:text-gray-400">Kids</a></li>
+            <li>
+              <a
+                href="/product/category/Clothing/subcategory/Men"
+                class="block hover:text-gray-400"
+                >Men</a
+              >
+            </li>
+            <li>
+              <a
+                href="/product/category/Clothing/subcategory/Women"
+                class="block hover:text-gray-400"
+                >Women</a
+              >
+            </li>
+            <li>
+              <a
+                href="/product/category/Clothing/subcategory/Kids"
+                class="block hover:text-gray-400"
+                >Kids</a
+              >
+            </li>
           </ul>
         </li>
         <li>
@@ -281,9 +321,27 @@
             Home ▼
           </button>
           <ul *ngIf="isHomeOpen" class="ml-4 space-y-2">
-            <li><a href="/product/category/Home/subcategory/Furniture" class="block hover:text-gray-400">Furniture</a></li>
-            <li><a href="/product/category/Home/subcategory/Kitchen" class="block hover:text-gray-400">Kitchen</a></li>
-            <li><a href="/product/category/Home/subcategory/Decor" class="block hover:text-gray-400">Decor</a></li>
+            <li>
+              <a
+                href="/product/category/Home/subcategory/Furniture"
+                class="block hover:text-gray-400"
+                >Furniture</a
+              >
+            </li>
+            <li>
+              <a
+                href="/product/category/Home/subcategory/Kitchen"
+                class="block hover:text-gray-400"
+                >Kitchen</a
+              >
+            </li>
+            <li>
+              <a
+                href="/product/category/Home/subcategory/Decor"
+                class="block hover:text-gray-400"
+                >Decor</a
+              >
+            </li>
           </ul>
         </li>
       </ul>
@@ -318,10 +376,10 @@
       class="w-12 h-12 rounded-full border-2 border-white object-cover"
     />
     <div>
-      <p class="text-lg font-semibold">Hi!</p>
       <button (click)="logout()" class="text-sm text-red-400 hover:underline">
         Logout
       </button>
+      <button *ngIf="user.role == 0" (click)="upgradeRole()" class="text-sm text-400 hover:underline">Upgrade role</button>
     </div>
   </div>
 </div>

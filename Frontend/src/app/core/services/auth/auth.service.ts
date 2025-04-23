@@ -15,13 +15,22 @@ export class AuthService {
   // 🔥 Ahora usamos `signal` en lugar de `BehaviorSubject`
   authStatus = signal<boolean>(this.hasToken());
 
-  constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: any) {
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: any
+  ) {
     if (this.hasToken()) {
       this.authStatus.set(true);
     }
   }
 
-  register(firstName: string, lastName: string, email: string, password: string, image: File): Observable<AuthModel> {
+  register(
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+    image: File
+  ): Observable<AuthModel> {
     const formData = new FormData();
     formData.append('firstName', firstName);
     formData.append('lastName', lastName);
@@ -29,11 +38,7 @@ export class AuthService {
     formData.append('password', password);
     formData.append('image', image);
 
-    return this.http.post<AuthModel>(`${this.apiUrl}/register`, formData);
-  }
-
-  login(email: string, password: string): Observable<AuthModel> {
-    return this.http.post<AuthModel>(`${this.apiUrl}/login`, { email, password }).pipe(
+    return this.http.post<AuthModel>(`${this.apiUrl}/register`, formData).pipe(
       tap((res: any) => {
         if (res.token) {
           localStorage.setItem('token', res.token);
@@ -41,10 +46,31 @@ export class AuthService {
         }
       }),
       catchError((error) => {
-        console.error('Error in login:', error);
-        return throwError(() => new Error(error.error?.message || 'Error in auth'));
+        console.error('Error in register:', error);
+        return throwError(
+          () => new Error(error.error?.message || 'Error in auth')
+        );
       })
     );
+  }
+
+  login(email: string, password: string): Observable<AuthModel> {
+    return this.http
+      .post<AuthModel>(`${this.apiUrl}/login`, { email, password })
+      .pipe(
+        tap((res: any) => {
+          if (res.token) {
+            localStorage.setItem('token', res.token);
+            this.authStatus.set(true);
+          }
+        }),
+        catchError((error) => {
+          console.error('Error in login:', error);
+          return throwError(
+            () => new Error(error.error?.message || 'Error in auth')
+          );
+        })
+      );
   }
 
   logout(): void {
@@ -53,7 +79,7 @@ export class AuthService {
         this.removeToken();
         this.authStatus.set(false);
       },
-      error: (err) => console.error('Error al cerrar sesión:', err),
+      error: (err) => console.error('Error in logout:', err),
     });
   }
 
@@ -65,12 +91,40 @@ export class AuthService {
     return this.http.delete<AuthModel>(`${this.apiUrl}/delete/${userId}`);
   }
 
+  upgradeToPremium(
+    paymentMethod: string,
+    cardNumber: number,
+    securityNumber: number
+  ): Observable<any> {
+    const body = {
+      paymentMethod,
+      cardNumber,
+      securityNumber,
+    };
+
+    return this.http
+      .post<any>(`${this.apiUrl}/upgrade`, body)
+      .pipe(
+        tap((res) => {
+          console.log('Upgrade a premium exitoso:', res);
+        }),
+        catchError((error) => {
+          console.error('Error en upgrade:', error);
+          return throwError(
+            () => new Error(error.error?.message || 'Error en upgrade')
+          );
+        })
+      );
+  }
+
   isAuthenticated(): boolean {
-    return this.authStatus(); 
+    return this.authStatus();
   }
 
   getToken(): string | null {
-    return isPlatformBrowser(this.platformId) ? localStorage.getItem('token') : null;
+    return isPlatformBrowser(this.platformId)
+      ? localStorage.getItem('token')
+      : null;
   }
 
   getDecodedUser() {
@@ -85,6 +139,8 @@ export class AuthService {
   }
 
   private hasToken(): boolean {
-    return isPlatformBrowser(this.platformId) && !!localStorage.getItem('token');
+    return (
+      isPlatformBrowser(this.platformId) && !!localStorage.getItem('token')
+    );
   }
 }

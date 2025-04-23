@@ -80,6 +80,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'auth/upgradeRole',
+    loadComponent: () =>
+      import('../app/features/auth/upgrade-role/upgrade-role.component').then(
+        (m) => m.UpgradeRoleComponent
+      ),
+  },
+  {
     path: 'dashboard',
     loadComponent: () =>
       import('../app/features/dashboard/dashboard.component').then(
