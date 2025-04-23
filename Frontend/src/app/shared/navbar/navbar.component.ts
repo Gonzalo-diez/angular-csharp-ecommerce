@@ -99,6 +99,10 @@ export class NavbarComponent implements OnInit {
     this.router.navigate(['/auth/upgradeRole']);
   }
 
+  dashboard() {
+    this.router.navigate(['/dashboard'])
+  }
+
   logout() {
     try {
       const user = this.authService.getDecodedUser();

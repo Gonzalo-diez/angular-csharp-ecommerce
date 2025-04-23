@@ -178,6 +178,13 @@
         >
           Upgrade role
         </button>
+        <button 
+          *ngIf="user.role == 2"
+          (click)="dashboard()"
+          class="block w-full text-left px-4 py-2 hover:bg-gray-700"
+        >
+          Dashboard
+        </button>
       </div>
     </li>
 
@@ -253,6 +260,7 @@
       <ul *ngIf="isCategoriesOpen" class="ml-4 space-y-2">
         <li>
           <button
+            href="/product/category/Technology"
             class="w-full text-left hover:text-gray-400"
             (click)="toggleSubcategory('tech')"
           >
@@ -284,6 +292,7 @@
         </li>
         <li>
           <button
+            href="/product/category/Clothing"
             class="w-full text-left hover:text-gray-400"
             (click)="toggleSubcategory('clothing')"
           >
@@ -315,6 +324,7 @@
         </li>
         <li>
           <button
+            href="/product/category/Home"
             class="w-full text-left hover:text-gray-400"
             (click)="toggleSubcategory('home')"
           >
@@ -380,6 +390,7 @@
         Logout
       </button>
       <button *ngIf="user.role == 0" (click)="upgradeRole()" class="text-sm text-400 hover:underline">Upgrade role</button>
+      <button *ngIf="user.role == 2" (click)="dashboard()" class="text-sm text-400 hover:underline">Dashboard</button>
     </div>
   </div>
 </div>
