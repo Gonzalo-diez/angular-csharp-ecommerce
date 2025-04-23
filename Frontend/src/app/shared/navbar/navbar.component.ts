@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, Inject, effect } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProductService } from '../../core/services/product/product.service';
 import { AuthService } from '../../core/services/auth/auth.service';
@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   isSidebarOpen = false;
   isCategoriesOpen = false;
   isTechOpen = false;
@@ -28,8 +28,36 @@ export class NavbarComponent {
     private productService: ProductService,
     private authService: AuthService,
     private signalService: SignalService,
-    private router: Router
-  ) {}
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: any
+  ) {
+    effect(() => {
+      const isAuthenticated = this.authService.isAuthenticated();
+      this.isAuth = isAuthenticated;
+  
+      if (isAuthenticated) {
+        const decodedUser = this.authService.getDecodedUser();
+        if (decodedUser && decodedUser.id) {
+          this.authService.getUserById(decodedUser.id).subscribe({
+            next: (userData) => {
+              this.user = userData;
+            },
+            error: (err) => {
+              console.error('Error al obtener los datos del usuario:', err);
+            }
+          });
+        }
+      } else {
+        this.user = null;
+      }
+    });
+  }
+  
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.signalService.startConnections();
+    }
+  }
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;

@@ -37,7 +37,7 @@ export class AuthService {
       tap((res: any) => {
         if (res.token) {
           localStorage.setItem('token', res.token);
-          this.authStatus.set(true); // 🔥 Ahora usamos `signal`
+          this.authStatus.set(true);
         }
       }),
       catchError((error) => {
