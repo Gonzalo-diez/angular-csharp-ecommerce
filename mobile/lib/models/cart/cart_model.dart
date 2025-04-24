@@ -17,13 +17,15 @@ class CartModel {
   });
 
   factory CartModel.fromJson(Map<String, dynamic> json) => CartModel(
-    id: json['id'],
+    id: json['id'] ?? 0,
     userId: json['userId'],
     user: json['user'] != null ? AuthModel.fromJson(json['user']) : null,
     items:
-        (json['items'] as List)
+        (json['items'] as List?)
+            ?.where((item) => item['productId'] != null)
             .map((item) => CartItemModel.fromJson(item))
-            .toList(),
+            .toList() ??
+        [],
     createdAt: DateTime.parse(json['createdAt']),
   );
 

@@ -146,8 +146,8 @@ class _ProductItemScreenState extends State<ProductItemScreen> {
                             }
                           }
                           : null,
-                  icon: const Icon(Icons.add_shopping_cart),
-                  label: const Text('Agregar al carrito'),
+                  icon: const Icon(Icons.add_shopping_cart, color: Color.fromRGBO(255, 255, 255, 1),),
+                  label: const Text('Agregar al carrito', style: TextStyle(color: Color.fromRGBO(255, 255, 255, 1)),),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     padding: const EdgeInsets.symmetric(vertical: 14),

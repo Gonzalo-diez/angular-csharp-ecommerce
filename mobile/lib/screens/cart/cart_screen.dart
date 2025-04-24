@@ -55,7 +55,7 @@ class _CartScreenState extends State<CartScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('¡Compra realizada con éxito!')),
         );
-        _loadCart(); // refrescamos el carrito vacío
+        _loadCart();
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -68,39 +68,40 @@ class _CartScreenState extends State<CartScreen> {
   Future<void> _removeProduct(int productId) async {
     try {
       await _cartService.removeFromCart(productId);
-
       setState(() {
         cart!.items.removeWhere((item) => item.product.id == productId);
-      });
-
-      if (cart == null || cart!.items.isEmpty) {
-        setState(() {
+        if (cart!.items.isEmpty) {
           cart = null;
-        });
-      }
+        }
+      });
     } catch (e) {
-      setState(() => error = e.toString());
+      setState(() {
+        error = e.toString();
+      });
     }
   }
 
   Future<void> _clearCart() async {
     try {
       await _cartService.clearCart();
-
       setState(() {
-        cart!.items.clear();
+        cart = null;
       });
     } catch (e) {
-      setState(() => error = e.toString());
+      setState(() {
+        error = e.toString();
+      });
     }
   }
 
   double _calculateTotal() {
     final items = cart?.items;
-    if (items == null) return 0.0;
+    if (items == null || items.isEmpty) return 0.0;
 
     return items.fold(0.0, (sum, item) {
-      return sum + item.product.price * item.quantity;
+      final price = item.product.price;
+      final quantity = item.quantity ?? 0;
+      return sum + (price * quantity);
     });
   }
 
@@ -144,7 +145,9 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete),
-                              onPressed: () => _removeProduct(item.product.id),
+                              onPressed: () {
+                                _removeProduct(item.product.id);
+                              },
                             ),
                           ),
                         );

@@ -62,6 +62,11 @@ class CartService {
     final userId = prefs.getInt('userId')?.toString();
     final uri = Uri.parse('$baseUrl/remove/$productId?userId=$userId');
     final response = await http.delete(uri, headers: headers);
+
+    logger.i('✅ Respuesta recibida');
+    logger.d('🔢 Status code: ${response.statusCode}');
+    logger.d('📦 Body: ${response.body}');
+
     return _handleResponse<CartModel>(
       response,
       (json) => CartModel.fromJson(json),
@@ -74,6 +79,11 @@ class CartService {
     final userId = prefs.getInt('userId')?.toString();
     final uri = Uri.parse('$baseUrl/clear?userId=$userId');
     final response = await http.delete(uri, headers: headers);
+
+    logger.i('✅ Respuesta recibida');
+    logger.d('🔢 Status code: ${response.statusCode}');
+    logger.d('📦 Body: ${response.body}');
+
     return _handleResponse<CartModel>(
       response,
       (json) => CartModel.fromJson(json),

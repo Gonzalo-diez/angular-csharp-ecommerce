@@ -5,9 +5,9 @@ class CartItemModel {
   final int id;
   final int cartId;
   final CartModel? cart;
-  final int productId;
+  final int? productId;
   final ProductModel product;
-  final int quantity;
+  final int? quantity;
 
   CartItemModel({
     required this.id,
@@ -23,7 +23,9 @@ class CartItemModel {
     cartId: json['cartId'],
     cart: json['cart'] != null ? CartModel.fromJson(json['cart']) : null,
     productId: json['productId'],
-    product: ProductModel.fromJson(json['product']),
+    product: json['product'] != null
+    ? ProductModel.fromJson(json['product'])
+    : ProductModel.empty(),
     quantity: json['quantity'],
   );
 

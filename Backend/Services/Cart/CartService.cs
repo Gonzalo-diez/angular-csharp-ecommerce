@@ -112,7 +112,6 @@ public class CartService : ICartService
         return cart;
     }
 
-
     // Vaciar el carrito completamente
     public async Task<Cart?> ClearCartAsync(int? userId)
     {
@@ -135,5 +134,4 @@ public class CartService : ICartService
 
         return cart;
     }
-
 }

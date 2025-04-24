@@ -75,12 +75,27 @@ class ProductModel {
     this.imageUrl,
   });
 
+  /// Factory constructor para instanciar un producto vacío o por defecto
+  factory ProductModel.empty() => ProductModel(
+    id: 0,
+    name: '',
+    brand: '',
+    price: 0.0,
+    stock: 0,
+    category: ProductCategory.technology,
+    subCategory: ProductSubCategory.pc,
+    status: ProductStatus.disable,
+    ownerId: null,
+    owner: null,
+    imageUrl: '',
+  );
+
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
       id: json['id'] is int ? json['id'] : int.parse(json['id'].toString()),
-      name: json['name'].toString(),
+      name: json['name'] ?? '',
       brand: json['brand'].toString(),
-      price: (json['price'] as num).toDouble(),
+      price: (json['price'] ?? 0).toDouble(),
       stock:
           json['stock'] is int
               ? json['stock']

@@ -215,8 +215,8 @@ namespace Backend.Controllers
                     return Unauthorized("You are not authorized to delete this product from this cart.");
                 }
 
-                await _cartService.RemoveProductFromCartAsync(userId, productId);
-                return Ok(new { message = "Item removed from cart" });
+                var updatedCart = await _cartService.RemoveProductFromCartAsync(userId, productId);
+                return Ok(new { message = "Item removed from cart", updatedCart });
             }
             catch (Exception ex)
             {
@@ -240,8 +240,8 @@ namespace Backend.Controllers
                     return Unauthorized("You are not authorized to clear this cart.");
                 }
 
-                await _cartService.ClearCartAsync(userId);
-                return Ok(new { message = "Cart cleared" });
+                var updatedCart = await _cartService.ClearCartAsync(userId);
+                return Ok(new { message = "Cart cleared", updatedCart });
             }
             catch (Exception ex)
             {

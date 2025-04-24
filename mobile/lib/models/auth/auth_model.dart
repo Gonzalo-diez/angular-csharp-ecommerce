@@ -9,6 +9,7 @@ class AuthModel {
   final AuthRole role;
   final dynamic products;
   final dynamic purchases;
+  final String? imageAvatar;
 
   AuthModel({
     required this.id,
@@ -19,6 +20,7 @@ class AuthModel {
     required this.role,
     this.products,
     this.purchases,
+    this.imageAvatar,
   });
 
   factory AuthModel.fromJson(Map<String, dynamic> json) => AuthModel(
@@ -35,6 +37,7 @@ class AuthModel {
     : authRoleMap[json['Role']] ?? AuthRole.user,
     products: json['products'],
     purchases: json['purchases'],
+    imageAvatar: json['imageAvatar']?.toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -46,5 +49,6 @@ class AuthModel {
     'role': role.name,
     'products': products,
     'purchases': purchases,
+    'imageAvatar': imageAvatar,
   };
 }
