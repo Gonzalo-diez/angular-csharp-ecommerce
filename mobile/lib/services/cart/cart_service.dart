@@ -60,6 +60,11 @@ class CartService {
     final prefs = await SharedPreferences.getInstance();
     final headers = await _getAuthHeaders();
     final userId = prefs.getInt('userId')?.toString();
+
+    if (userId == null) {
+      throw Exception('No user ID found in SharedPreferences');
+    }
+
     final uri = Uri.parse('$baseUrl/remove/$productId?userId=$userId');
     final response = await http.delete(uri, headers: headers);
 
@@ -67,16 +72,27 @@ class CartService {
     logger.d('🔢 Status code: ${response.statusCode}');
     logger.d('📦 Body: ${response.body}');
 
-    return _handleResponse<CartModel>(
-      response,
-      (json) => CartModel.fromJson(json),
-    );
+    if (response.statusCode == 200) {
+      return _handleResponse<CartModel>(
+        response,
+        (json) => CartModel.fromJson(json['updatedCart']),
+      );
+    } else {
+      throw Exception(
+        'Failed to remove product. Status code: ${response.statusCode}',
+      );
+    }
   }
 
   Future<CartModel> clearCart() async {
     final prefs = await SharedPreferences.getInstance();
     final headers = await _getAuthHeaders();
     final userId = prefs.getInt('userId')?.toString();
+
+    if (userId == null) {
+      throw Exception('No user ID found in SharedPreferences');
+    }
+
     final uri = Uri.parse('$baseUrl/clear?userId=$userId');
     final response = await http.delete(uri, headers: headers);
 
@@ -84,10 +100,16 @@ class CartService {
     logger.d('🔢 Status code: ${response.statusCode}');
     logger.d('📦 Body: ${response.body}');
 
-    return _handleResponse<CartModel>(
-      response,
-      (json) => CartModel.fromJson(json),
-    );
+    if (response.statusCode == 200) {
+      return _handleResponse<CartModel>(
+        response,
+        (json) => CartModel.fromJson(json['updatedCart']),
+      );
+    } else {
+      throw Exception(
+        'Failed to clear cart. Status code: ${response.statusCode}',
+      );
+    }
   }
 
   Future<InvoiceModel> checkout(CheckoutRequestModel request) async {

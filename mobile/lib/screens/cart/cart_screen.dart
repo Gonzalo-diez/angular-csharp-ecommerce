@@ -48,7 +48,6 @@ class _CartScreenState extends State<CartScreen> {
     final result = await Navigator.pushNamed(context, '/checkout');
 
     if (result != null && result is CheckoutRequestModel) {
-      // Acá hacés el request al backend para procesar el checkout
       try {
         await _cartService.checkout(result);
         if (!mounted) return;
@@ -62,35 +61,6 @@ class _CartScreenState extends State<CartScreen> {
           SnackBar(content: Text('Error al procesar la compra: $e')),
         );
       }
-    }
-  }
-
-  Future<void> _removeProduct(int productId) async {
-    try {
-      await _cartService.removeFromCart(productId);
-      setState(() {
-        cart!.items.removeWhere((item) => item.product.id == productId);
-        if (cart!.items.isEmpty) {
-          cart = null;
-        }
-      });
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-      });
-    }
-  }
-
-  Future<void> _clearCart() async {
-    try {
-      await _cartService.clearCart();
-      setState(() {
-        cart = null;
-      });
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-      });
     }
   }
 
@@ -113,8 +83,28 @@ class _CartScreenState extends State<CartScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_forever),
-            onPressed: _clearCart,
-            tooltip: 'Vaciar carrito',
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Confirmar vaciar carrito'),
+                  content: const Text('¿Estás seguro de querer vaciar el carrito?'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.of(context).pop(false), 
+                      child: const Text('Cancelar'),
+                    ),
+                    ElevatedButton(onPressed: () => Navigator.of(context).pop(true), 
+                      child: const Text('Vaciar'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirm == true) {
+                await _cartService.clearCart();
+                _loadCart();
+              }
+            },
           ),
         ],
       ),
@@ -145,8 +135,35 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.delete),
-                              onPressed: () {
-                                _removeProduct(item.product.id);
+                              onPressed: () async {
+                                final confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Confirmar eliminar producto del carrito'),
+                                    content: const Text(
+                                      '¿Estás seguro que quieres quitar el producto del carrito?',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: 
+                                          () => Navigator.of(
+                                            context,
+                                          ).pop(false), 
+                                          child: const Text('Cancelar')
+                                        ),
+                                        ElevatedButton(
+                                          onPressed:
+                                            () => Navigator.of(context).pop(true), 
+                                          child: const Text('Eliminar'),
+                                        ),
+                                    ],
+                                  ),
+                                );
+
+                                if (confirm == true) {
+                                  await _cartService.removeFromCart(item.product.id);
+                                  _loadCart();
+                                }
                               },
                             ),
                           ),

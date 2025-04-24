@@ -346,6 +346,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
                             if (confirm == true) {
                               await _productService.deleteProduct(product.id);
+                              _fetchProducts();
                             }
                           },
                         ),
