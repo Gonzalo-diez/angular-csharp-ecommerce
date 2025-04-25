@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile/services/auth/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -15,9 +17,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final lastNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  File? imageFile;
 
   bool isLoading = false;
   String? errorMessage;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        imageFile = File(pickedFile.path);
+      });
+    }
+  }
 
   Future<void> _register(BuildContext context) async {
     setState(() {
@@ -31,6 +45,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       lastNameController.text,
       emailController.text,
       passwordController.text,
+      imageFile,
     );
 
     setState(() => isLoading = false);
@@ -110,6 +125,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: _pickImage,
+                  icon: const Icon(Icons.image),
+                  label: const Text('Seleccionar Imagen'),
+                ),
+                if (imageFile != null) Image.file(imageFile!, height: 100),
                 if (errorMessage != null)
                   Text(
                     errorMessage!,

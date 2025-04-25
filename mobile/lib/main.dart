@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/screens/cart/shipping-form/shipping_form_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile/services/auth/auth_service.dart';
 import 'package:mobile/widgets/main_layout.dart';
@@ -13,6 +12,8 @@ import 'package:mobile/screens/auth/register_screen.dart';
 import 'package:mobile/screens/dashboard/dashboard_screen.dart';
 import 'package:mobile/screens/cart/cart_screen.dart';
 import 'package:mobile/screens/product/product-category/product_category_screen.dart';
+import 'package:mobile/screens/cart/shipping-form/shipping_form_screen.dart';
+import 'package:mobile/screens/auth/upgrade_role_screen.dart';
 
 void main() {
   runApp(
@@ -58,6 +59,7 @@ class _MyAppState extends State<MyApp> {
             ),
         '/auth/login': (context) => const LoginScreen(),
         '/auth/register': (context) => const RegisterScreen(),
+        '/upgrade': (context) => const UpgradeRoleScreen(),
         '/dashboard': (context) => const DashboardScreen(),
         '/cart': (context) => const CartScreen(),
         '/checkout': (context) => const ShippingFormScreen(),

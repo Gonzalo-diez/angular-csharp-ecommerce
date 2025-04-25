@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -24,6 +25,7 @@ class AuthService with ChangeNotifier {
 
   bool get isAdmin => _role == 'admin';
   bool get isPremium => _role == 'premium';
+  bool get isUser => _role == 'user';
 
   AuthService() {
     _loadToken();
@@ -134,18 +136,31 @@ class AuthService with ChangeNotifier {
     String lastName,
     String email,
     String password,
+    File? image,
   ) async {
     try {
-      final response = await http.post(
-        Uri.parse('$_baseUrl/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'firstName': firstName,
-          'lastName': lastName,
-          'email': email,
-          'password': password,
-        }),
-      );
+      var uri = Uri.parse('$_baseUrl/register');
+      var request = http.MultipartRequest('POST', uri);
+
+      // Campos de texto
+      request.fields['firstName'] = firstName;
+      request.fields['lastName'] = lastName;
+      request.fields['email'] = email;
+      request.fields['password'] = password;
+
+      // Imagen (si se seleccionó una)
+      if (image != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath('imageAvatar', image.path),
+        );
+      }
+
+      // Enviar la request
+      var response = await request.send();
+
+      // Leer respuesta completa
+      var responseBody = await response.stream.bytesToString();
+      debugPrint(responseBody);
 
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
@@ -196,5 +211,62 @@ class AuthService with ChangeNotifier {
     );
 
     return response.statusCode == 200;
+  }
+
+  Future<bool> upgradeRole({
+    required String paymentMethod,
+    required String cardNumber,
+    required String securityNumber,
+  }) async {
+    if (_token == null || _userId == null) {
+      logger.e("⛔️ No hay token o userId disponible.");
+      return false;
+    }
+
+    try {
+      final uri = Uri.parse(
+        '$_baseUrl/upgrade',
+      ).replace(queryParameters: {'userId': _userId});
+
+      final response = await http.post(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $_token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'paymentMethod': paymentMethod,
+          'cardNumber': cardNumber,
+          'securityNumber': securityNumber,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        logger.i("✨ Upgrade exitoso: ${data['message']}");
+
+        _role = data['user']['role'];
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('role', _role!);
+
+        notifyListeners();
+        return true;
+      } else {
+        try {
+          final decoded = jsonDecode(response.body);
+          final error =
+              decoded is Map<String, dynamic>
+                  ? decoded['message']
+                  : 'Error desconocido';
+          logger.w("⚠️ Error al hacer upgrade: $error");
+        } catch (e) {
+          logger.e("❌ Error decodificando el error: $e");
+        }
+        return false;
+      }
+    } catch (e) {
+      logger.e("❌ Error en upgradeRole: $e");
+      return false;
+    }
   }
 }

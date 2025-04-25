@@ -2,8 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile/services/auth/auth_service.dart';
 
-class CustomSidebar extends StatelessWidget {
+class CustomSidebar extends StatefulWidget {
   const CustomSidebar({super.key});
+
+  @override
+  State<CustomSidebar> createState() => _CustomSidebarState();
+}
+
+class _CustomSidebarState extends State<CustomSidebar> {
+  Map<String, dynamic>? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    final auth = Provider.of<AuthService>(context, listen: false);
+    if (auth.isAuthenticated && auth.userId != null) {
+      final data = await auth.getUserById(auth.userId!);
+      if (mounted) {
+        setState(() {
+          userData = data;
+        });
+      }
+    }
+  }
 
   // Widget para categoría y subcategorías
   Widget _buildCategoryWithSubcategories(
@@ -60,15 +85,49 @@ class CustomSidebar extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blue),
-            child: Text(
-              'Menú',
-              style: TextStyle(color: Colors.white, fontSize: 20),
+          DrawerHeader(
+            decoration: const BoxDecoration(color: Colors.blue),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Si está logueado y tiene imagen, mostrarla
+                if (auth.isAuthenticated)
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage:
+                        userData != null
+                            ? NetworkImage(
+                              'http://192.168.1.6:5180${userData!['imageAvatar']}',
+                            )
+                            : const AssetImage('assets/default_avatar.png')
+                                as ImageProvider,
+                  )
+                else
+                  const CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.person, size: 30),
+                  ),
+                const SizedBox(height: 10),
+                Text(
+                  auth.isAuthenticated
+                      ? '${userData?['firstName'] ?? ''} ${userData?['lastName'] ?? ''}'
+                      : 'Invitado',
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              ],
             ),
           ),
-
-          // Login / Logout arriba
+          if (auth.isUser)
+            ListTile(
+              leading: const Icon(Icons.verified_user_sharp),
+              title: const Text('Premium'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/upgrade');
+              },
+            ),
+          // Login / Logout
           ListTile(
             leading: Icon(auth.isAuthenticated ? Icons.logout : Icons.login),
             title: Text(
