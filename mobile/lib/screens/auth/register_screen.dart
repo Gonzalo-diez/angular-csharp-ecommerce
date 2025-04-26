@@ -46,6 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       emailController.text,
       passwordController.text,
       imageFile,
+      context,
     );
 
     setState(() => isLoading = false);

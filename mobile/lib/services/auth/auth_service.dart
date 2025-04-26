@@ -137,34 +137,96 @@ class AuthService with ChangeNotifier {
     String email,
     String password,
     File? image,
+    BuildContext context,
   ) async {
     try {
       var uri = Uri.parse('$_baseUrl/register');
+      logger.i('Enviando registro a $uri');
+
       var request = http.MultipartRequest('POST', uri);
 
-      // Campos de texto
       request.fields['firstName'] = firstName;
       request.fields['lastName'] = lastName;
       request.fields['email'] = email;
       request.fields['password'] = password;
 
-      // Imagen (si se seleccionó una)
+      logger.d('Campos enviados: ${request.fields}');
+
       if (image != null) {
+        logger.i('Adjuntando imagen: ${image.path}');
         request.files.add(
-          await http.MultipartFile.fromPath('imageAvatar', image.path),
+          await http.MultipartFile.fromPath('image', image.path),
         );
       }
 
-      // Enviar la request
       var response = await request.send();
+      logger.i('Status code recibido: ${response.statusCode}');
 
-      // Leer respuesta completa
       var responseBody = await response.stream.bytesToString();
-      debugPrint(responseBody);
+      logger.d('Respuesta body: $responseBody');
 
-      return response.statusCode == 200 || response.statusCode == 201;
-    } catch (e) {
-      debugPrint('Register error: $e');
+      var success = response.statusCode == 200 || response.statusCode == 201;
+
+      if (success) {
+        final data = jsonDecode(responseBody);
+        _token = data['token'];
+
+        if (_token != null) {
+          final decodedToken = JwtDecoder.decode(_token!);
+          logger.i('📦 Token decodificado: $decodedToken');
+
+          dynamic userRaw = decodedToken['user'];
+
+          if (userRaw == null) {
+            logger.e('❌ El token no contiene el campo "user".');
+            return false;
+          }
+
+          Map<String, dynamic> userMap;
+          try {
+            userMap =
+                userRaw is String
+                    ? jsonDecode(userRaw)
+                    : Map<String, dynamic>.from(userRaw);
+          } catch (e) {
+            logger.e('❌ Error al decodificar userMap: $e');
+            return false;
+          }
+
+          final prefs = await SharedPreferences.getInstance();
+          int? userId;
+
+          final dynamic rawId = userMap['Id'] ?? userMap['id'];
+          if (rawId is int) {
+            userId = rawId;
+          } else if (rawId is String) {
+            userId = int.tryParse(rawId);
+          }
+
+          if (userId != null) {
+            _userId = userId;
+            await prefs.setInt('userId', userId);
+            logger.i('🆔 userId guardado: $userId');
+          } else {
+            logger.w('⚠️ userId no encontrado o inválido');
+          }
+
+          _role = 'user';
+          await prefs.setString('role', _role!);
+          await prefs.setString('token', _token!);
+
+          _isAuthenticated = true;
+          notifyListeners();
+
+          if (!context.mounted) return true;
+          Navigator.of(context).pushReplacementNamed('/home');
+        }
+      }
+
+      logger.i('Registro exitoso: $success');
+      return success;
+    } catch (e, stackTrace) {
+      logger.e('Error al registrar usuario', error: e, stackTrace: stackTrace);
       return false;
     }
   }
@@ -218,16 +280,13 @@ class AuthService with ChangeNotifier {
     required String cardNumber,
     required int securityNumber,
   }) async {
-    
     if (_token == null || _userId == null) {
       logger.e("⛔️ No hay token o userId disponible.");
       return false;
     }
 
     try {
-      final uri = Uri.parse(
-        '$_baseUrl/upgrade?userId=${_userId.toString()}',
-      );
+      final uri = Uri.parse('$_baseUrl/upgrade?userId=${_userId.toString()}');
 
       final response = await http.post(
         uri,
