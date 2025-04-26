@@ -216,8 +216,9 @@ class AuthService with ChangeNotifier {
   Future<bool> upgradeRole({
     required String paymentMethod,
     required String cardNumber,
-    required String securityNumber,
+    required int securityNumber,
   }) async {
+    
     if (_token == null || _userId == null) {
       logger.e("⛔️ No hay token o userId disponible.");
       return false;
@@ -225,8 +226,8 @@ class AuthService with ChangeNotifier {
 
     try {
       final uri = Uri.parse(
-        '$_baseUrl/upgrade',
-      ).replace(queryParameters: {'userId': _userId});
+        '$_baseUrl/upgrade?userId=${_userId.toString()}',
+      );
 
       final response = await http.post(
         uri,
@@ -241,27 +242,27 @@ class AuthService with ChangeNotifier {
         }),
       );
 
+      logger.i("📤 Request enviado a $uri");
+      logger.i(
+        "📥 Response recibido: ${response.statusCode} - ${response.body}",
+      );
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         logger.i("✨ Upgrade exitoso: ${data['message']}");
 
-        _role = data['user']['role'];
+        _role = data['user']['role'].toString();
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('role', _role!);
 
         notifyListeners();
         return true;
       } else {
-        try {
-          final decoded = jsonDecode(response.body);
-          final error =
-              decoded is Map<String, dynamic>
-                  ? decoded['message']
-                  : 'Error desconocido';
-          logger.w("⚠️ Error al hacer upgrade: $error");
-        } catch (e) {
-          logger.e("❌ Error decodificando el error: $e");
-        }
+        logger.w("⚠️ Error status: ${response.statusCode}");
+        logger.w("⚠️ Respuesta completa: ${response.body}");
+
+        final error = jsonDecode(response.body)['message'];
+        logger.w("⚠️ Mensaje de error: $error");
         return false;
       }
     } catch (e) {

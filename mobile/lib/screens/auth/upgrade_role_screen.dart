@@ -29,7 +29,7 @@ class _UpgradeRoleScreenState extends State<UpgradeRoleScreen> {
     final success = await authService.upgradeRole(
       paymentMethod: _paymentMethod,
       cardNumber: _cardNumber,
-      securityNumber: _securityNumber,
+      securityNumber: int.parse(_securityNumber),
     );
 
     if (!mounted) return;
