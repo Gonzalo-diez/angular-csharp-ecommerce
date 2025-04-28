@@ -61,7 +61,38 @@
     </aside>
 
     <div class="w-full md:w-3/4">
-      <app-product-shared [products]="filteredProducts"></app-product-shared>
+      <app-product-shared [products]="paginatedProducts"></app-product-shared>
+      <div
+        *ngIf="totalPages > 1"
+        class="flex justify-center items-center mt-6 gap-2"
+      >
+        <button
+          (click)="currentPage = currentPage - 1"
+          [disabled]="currentPage === 1"
+          class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"
+        >
+          ‹
+        </button>
+
+        <span *ngFor="let page of [].constructor(totalPages); let i = index">
+          <button
+            (click)="currentPage = i + 1"
+            [class.bg-blue-600]="currentPage === i + 1"
+            [class.text-white]="currentPage === i + 1"
+            class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"
+          >
+            {{ i + 1 }}
+          </button>
+        </span>
+
+        <button
+          (click)="currentPage = currentPage + 1"
+          [disabled]="currentPage === totalPages"
+          class="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"
+        >
+          ›
+        </button>
+      </div>
     </div>
   </div>
 </div>

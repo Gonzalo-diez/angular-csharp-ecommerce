@@ -14,6 +14,8 @@ import { ProductCategory } from '../../../core/models/product/product-category';
   styleUrl: './product-subcategory.component.css',
 })
 export class ProductSubcategoryComponent implements OnInit {
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
   showFilters = false;
   category: string | null = null;
   subcategory: string | null = null;
@@ -63,6 +65,16 @@ export class ProductSubcategoryComponent implements OnInit {
         (!this.maxPrice || product.price <= this.maxPrice)
       );
     });
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+  }
+
+  get paginatedProducts(): ProductModel[] {
+    const startIndex = (this.currentPage -1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredProducts.slice(startIndex, endIndex);
   }
 
   toggleFilters() {

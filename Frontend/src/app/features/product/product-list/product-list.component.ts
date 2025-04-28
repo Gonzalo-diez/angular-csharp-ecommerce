@@ -15,6 +15,8 @@ import { ProductSharedComponent } from '../product-shared/product-shared.compone
   styleUrl: './product-list.component.css',
 })
 export class ProductListComponent implements OnInit {
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
   showFilters = false;
   products: ProductModel[] = [];
   filteredProducts: ProductModel[] = [];
@@ -112,6 +114,16 @@ export class ProductListComponent implements OnInit {
     }
 
     this.productSubCategory = undefined; // Reinicia la selección de subcategoría
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+  }
+
+  get paginatedProducts(): ProductModel[] {
+    const startIndex = (this.currentPage -1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredProducts.slice(startIndex, endIndex);
   }
 
   toggleFilters() {
