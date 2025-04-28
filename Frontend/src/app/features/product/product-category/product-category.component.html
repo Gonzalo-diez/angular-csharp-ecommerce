@@ -2,7 +2,7 @@
   <div class="flex flex-col md:flex-row gap-6 items-start">
     <button
       (click)="toggleFilters()"
-      class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md mb-4"
+      class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -20,41 +20,54 @@
       </svg>
     </button>
     <aside
-      *ngIf="showFilters"
-      class="filters bg-white shadow-md rounded-lg p-4 w-full md:w-1/4 flex flex-col gap-4 self-start"
+      [ngClass]="{
+        'translate-x-0': showFilters,
+        '-translate-x-full': !showFilters
+      }"
+      class="fixed top-0 left-0 w-64 h-full bg-white shadow-lg p-4 z-40 transition-transform duration-300 ease-in-out overflow-y-auto"
     >
-      <h2 class="text-lg font-semibold mb-2">Filters</h2>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold">Filters</h2>
+        <button
+          (click)="toggleFilters()"
+          class="text-gray-500 text-2xl font-bold"
+        >
+          &times;
+        </button>
+      </div>
 
-      <input
-        type="number"
-        [(ngModel)]="minPrice"
-        placeholder="Min Price"
-        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+      <div class="flex flex-col space-y-4 mb-6">
+        <input
+          type="number"
+          [(ngModel)]="minPrice"
+          placeholder="Min Price"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
 
-      <input
-        type="number"
-        [(ngModel)]="maxPrice"
-        placeholder="Min Price"
-        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+        <input
+          type="number"
+          [(ngModel)]="maxPrice"
+          placeholder="Min Price"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
 
-      <select
-        [(ngModel)]="productSubCategory"
-        class="w-full px-4 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <option [ngValue]="undefined">All Subcategories</option>
-        <option *ngFor="let sub of productSubCategories" [ngValue]="sub">
-          {{ sub }}
-        </option>
-      </select>
+        <select
+          [(ngModel)]="productSubCategory"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option [ngValue]="undefined">All Subcategories</option>
+          <option *ngFor="let sub of productSubCategories" [ngValue]="sub">
+            {{ sub }}
+          </option>
+        </select>
 
-      <button
-        (click)="filterProducts()"
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md transition duration-300"
-      >
-        Filter
-      </button>
+        <button
+          (click)="filterProducts()"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md transition duration-300"
+        >
+          Filter
+        </button>
+      </div>
     </aside>
 
     <div class="w-full md:w-3/4">

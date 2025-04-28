@@ -4,22 +4,25 @@
     <p>There are no products available.</p>
   </div>
 
-  <button
-    *ngIf="canAddProduct()"
-    (click)="goToAddProduct()"
-    class="btn btn-primary"
-  >
-    Agregar Producto
-  </button>
+  <!-- Botón Agregar Producto -->
+  <div class="flex justify-center mb-6">
+    <button
+      *ngIf="canAddProduct()"
+      (click)="goToAddProduct()"
+      class="btn btn-primary"
+    >
+      Agregar Producto
+    </button>
+  </div>
 
   <!-- Lista de productos -->
-  <ol
+  <div
     *ngIf="products.length > 0"
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+    class="flex flex-wrap justify-center gap-6"
   >
-    <li
+    <div
       *ngFor="let product of products"
-      class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition"
+      class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition cursor-pointer w-48"
       [routerLink]="['/product', product.id]"
     >
       <img
@@ -38,22 +41,26 @@
         <strong>Category:</strong> {{ product.category }}
       </p>
 
-      <button
-        *ngIf="
-          product.ownerId !== undefined &&
-          (userId === product.ownerId || userRole === 'admin')
-        "
-        (click)="deleteProduct(product.id!); $event.stopPropagation()"
-      >
-        🗑️ Eliminar
-      </button>
+      <div class="mt-3 space-x-2">
+        <button
+          *ngIf="
+            product.ownerId !== undefined &&
+            (userId === product.ownerId || userRole === 'admin')
+          "
+          (click)="deleteProduct(product.id!); $event.stopPropagation()"
+          class="text-red-500 hover:text-red-700"
+        >
+          🗑️
+        </button>
 
-      <button
-        *ngIf="userId === product.ownerId"
-        (click)="goToUpdateProduct(product.id!, product.ownerId); $event.stopPropagation()"
-      >
-        ✎ Editar producto
-      </button>
-    </li>
-  </ol>
+        <button
+          *ngIf="userId === product.ownerId"
+          (click)="goToUpdateProduct(product.id!, product.ownerId); $event.stopPropagation()"
+          class="text-blue-500 hover:text-blue-700"
+        >
+          ✎
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
