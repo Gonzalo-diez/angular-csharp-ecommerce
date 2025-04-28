@@ -14,6 +14,7 @@ import { ProductCategory } from '../../../core/models/product/product-category';
   styleUrl: './product-subcategory.component.css',
 })
 export class ProductSubcategoryComponent implements OnInit {
+  showFilters = false;
   category: string | null = null;
   subcategory: string | null = null;
   subcategoryProducts: ProductModel[] = [];
@@ -62,5 +63,9 @@ export class ProductSubcategoryComponent implements OnInit {
         (!this.maxPrice || product.price <= this.maxPrice)
       );
     });
+  }
+
+  toggleFilters() {
+    this.showFilters = !this.showFilters;
   }
 }

@@ -15,6 +15,7 @@ import { ProductSharedComponent } from '../product-shared/product-shared.compone
   styleUrl: './product-list.component.css',
 })
 export class ProductListComponent implements OnInit {
+  showFilters = false;
   products: ProductModel[] = [];
   filteredProducts: ProductModel[] = [];
 
@@ -25,7 +26,6 @@ export class ProductListComponent implements OnInit {
 
   productCategories = Object.values(ProductCategory);
   productSubCategories: ProductSubCategory[] = [];
-
   allSubCategories = Object.values(ProductSubCategory);
 
   constructor(private productService: ProductService) {}
@@ -112,5 +112,9 @@ export class ProductListComponent implements OnInit {
     }
 
     this.productSubCategory = undefined; // Reinicia la selección de subcategoría
+  }
+
+  toggleFilters() {
+    this.showFilters = !this.showFilters;
   }
 }

@@ -15,6 +15,7 @@ import { ProductSharedComponent } from '../product-shared/product-shared.compone
   styleUrls: ['./product-category.component.css'],
 })
 export class ProductCategoryComponent implements OnInit {
+  showFilters = false;
   category: string | null = null;
   categoryProducts: ProductModel[] = [];
   filteredProducts: ProductModel[] = [];
@@ -123,5 +124,9 @@ export class ProductCategoryComponent implements OnInit {
     }
 
     this.productSubCategory = undefined; // Reinicia la selección de subcategoría
+  }
+
+  toggleFilters() {
+    this.showFilters = !this.showFilters;
   }
 }
