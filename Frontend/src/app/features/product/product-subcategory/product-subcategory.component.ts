@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductModel } from '../../../core/models/product/product.model';
 import { ProductService } from '../../../core/services/product/product.service';
-import { ProductSharedComponent } from '../product-shared/product-shared.component';
+import { ProductSharedComponent } from '../../../shared/product-shared/product-shared.component';
 import { ProductCategory } from '../../../core/models/product/product-category';
 
 @Component({

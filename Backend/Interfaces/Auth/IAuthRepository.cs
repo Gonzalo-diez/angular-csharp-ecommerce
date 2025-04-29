@@ -1,6 +1,6 @@
 using Backend.Models;
 
-namespace Backend.Repositories.Interfaces
+namespace Backend.Interfaces
 {
     public interface IAuthRepository
     {

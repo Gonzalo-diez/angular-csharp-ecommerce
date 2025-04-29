@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { ProductModel } from '../../../core/models/product/product.model';
-import { AuthRole } from '../../../core/models/auth/auth.role';
-import { AuthService } from '../../../core/services/auth/auth.service';
-import { ProductService } from '../../../core/services/product/product.service';
+import { ProductModel } from '../../core/models/product/product.model';
+import { AuthRole } from '../../core/models/auth/auth.role';
+import { AuthService } from '../../core/services/auth/auth.service';
+import { ProductService } from '../../core/services/product/product.service';
 
 @Component({
   selector: 'app-product-shared',

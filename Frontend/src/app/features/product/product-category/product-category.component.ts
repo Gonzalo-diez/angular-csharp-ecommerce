@@ -6,7 +6,7 @@ import { ProductService } from '../../../core/services/product/product.service';
 import { ProductModel } from '../../../core/models/product/product.model';
 import { ProductCategory } from '../../../core/models/product/product-category';
 import { ProductSubCategory } from '../../../core/models/product/product-sub-category';
-import { ProductSharedComponent } from '../product-shared/product-shared.component';
+import { ProductSharedComponent } from '../../../shared/product-shared/product-shared.component';
 
 @Component({
   selector: 'app-product-category',

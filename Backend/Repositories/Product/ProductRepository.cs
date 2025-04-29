@@ -3,7 +3,6 @@ using Backend.Interfaces;
 using Backend.Models;
 using Backend.Constants;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Backend.Repositories
 {

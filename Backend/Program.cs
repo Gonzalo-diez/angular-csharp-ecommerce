@@ -2,7 +2,6 @@ using Backend.Data;
 using Backend.Interfaces;
 using Backend.Services;
 using Backend.Repositories;
-using Backend.Repositories.Interfaces;
 using Backend.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
@@ -182,3 +181,5 @@ app.Use(async (context, next) =>
 });
 
 app.Run();
+
+public partial class Program { }

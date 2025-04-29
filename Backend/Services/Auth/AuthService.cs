@@ -1,5 +1,4 @@
 using Backend.Models;
-using Backend.Repositories.Interfaces;
 using Backend.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,7 +7,6 @@ using System.Text;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.SignalR;
 using Backend.Hubs;
-using Backend.Identity;
 
 namespace Backend.Services
 {
