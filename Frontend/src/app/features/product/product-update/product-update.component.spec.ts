@@ -70,19 +70,6 @@ describe('ProductUpdateComponent', () => {
     });
 
     it('should authenticate user and load product by id', () => {
-      const mockProduct: ProductModel = {
-        id: 1,
-        name: 'test',
-        brand: 'test',
-        price: 100,
-        stock: 10,
-        category: ProductCategory.Technology,
-        subCategory: ProductSubCategory.PC,
-        status: ProductStatus.Enable,
-        imageUrl: 'product.png',
-        ownerId: 5,
-      };
-
       const mockToken =
         'header.' +
         btoa(JSON.stringify({ user: JSON.stringify({ Id: 5 }) })) +

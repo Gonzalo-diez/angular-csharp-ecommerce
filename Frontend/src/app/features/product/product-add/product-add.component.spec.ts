@@ -1,17 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProductAddComponent } from './product-add.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { of } from 'rxjs';
 import { ProductCategory } from '../../../core/models/product/product-category';
 import { ProductSubCategory } from '../../../core/models/product/product-sub-category';
 import { ProductStatus } from '../../../core/models/product/product-status';
 import { ProductService } from '../../../core/services/product/product.service';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { ProductModel } from '../../../core/models/product/product.model';
 
 describe('ProductAddComponent', () => {
   let component: ProductAddComponent;
   let fixture: ComponentFixture<ProductAddComponent>;
-  let mockProductService: jest.Mocked<ProductService>;
+  let mockProductService: ProductService;
   let mockAuthService: jest.Mocked<AuthService>;
+
+  const mockProduct: ProductModel = {
+      id: 1,
+      name: 'test',
+      brand: 'test',
+      price: 100,
+      stock: 10,
+      category: ProductCategory.Technology,
+      subCategory: ProductSubCategory.PC,
+      status: ProductStatus.Enable,
+      imageUrl: 'product.png',
+      ownerId: 5,
+    };
 
   beforeEach(async () => {
     mockProductService = {
@@ -30,6 +45,10 @@ describe('ProductAddComponent', () => {
         { provide: AuthService, useValue: mockAuthService }
       ]
     }).compileComponents();
+
+    mockProductService = TestBed.inject(ProductService);
+
+    jest.spyOn(mockProductService, 'addProduct').mockReturnValue(of(mockProduct))
 
     fixture = TestBed.createComponent(ProductAddComponent);
     component = fixture.componentInstance;
