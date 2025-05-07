@@ -1,11 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../core/services/dashboard/dashboard.service';
-import {
-  DashboardModel,
-  CategorySalesDto,
-  SubcategorySalesDto,
-} from '../../core/models/dashboard/dashboard.model';
+import { DashboardModel } from '../../core/models/dashboard/dashboard.model';
 import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({

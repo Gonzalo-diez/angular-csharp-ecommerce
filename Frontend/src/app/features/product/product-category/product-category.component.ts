@@ -48,10 +48,8 @@ export class ProductCategoryComponent implements OnInit {
       next: (data) => {
         this.categoryProducts = data.map((product) => ({
           ...product,
-          category: Object.values(ProductCategory)[Number(product.category)] as ProductCategory,
-          subCategory: Object.values(ProductSubCategory)[
-            Number(product.subCategory)
-          ] as ProductSubCategory,
+          category: product.category as ProductCategory,
+          subCategory: product.subCategory as ProductSubCategory,
         }));
 
         this.filteredProducts = [...this.categoryProducts];

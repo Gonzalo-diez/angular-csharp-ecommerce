@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -7,6 +7,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../core/services/product/product.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-product-add',
@@ -15,11 +16,10 @@ import { ProductService } from '../../../core/services/product/product.service';
   templateUrl: './product-add.component.html',
   styleUrls: ['./product-add.component.css'],
 })
-export class ProductAddComponent {
+export class ProductAddComponent implements OnInit {
+  userId: number | null = null;
   productForm: FormGroup;
-
   categories = ['Technology', 'Clothing', 'Home'];
-
   subcategoriesMap: { [key: string]: string[] } = {
     Technology: ['PC', 'Console', 'Smartphone'],
     Clothing: ['Men', 'Women', 'Kids'],
@@ -28,7 +28,7 @@ export class ProductAddComponent {
 
   subcategories: string[] = [];
 
-  constructor(private fb: FormBuilder, private productService: ProductService) {
+  constructor(private fb: FormBuilder, private productService: ProductService, private authService: AuthService) {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
       brand: ['', Validators.required],
@@ -45,6 +45,15 @@ export class ProductAddComponent {
       this.subcategories = this.subcategoriesMap[category] || [];
       this.productForm.patchValue({ subCategory: '' });
     });
+  }
+
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated()) {
+      const token = this.authService.getToken();
+      if (token) {
+        this.userId = this.decodeToken(token);
+      }
+    }
   }
 
   onFileSelected(event: any) {
@@ -78,6 +87,26 @@ export class ProductAddComponent {
       );
     } else {
       console.log('Formulario inválido');
+    }
+  }
+
+  private decodeToken(token: string): number | null {
+    try {
+      const base64Url = token.split('.')[1]; // Extrae la parte del payload del JWT
+      if (!base64Url) return null;
+
+      const payload = JSON.parse(atob(base64Url)); // Decodifica el payload
+
+      // Verifica si existe la propiedad "user" y conviértela en objeto
+      const userData = payload.user ? JSON.parse(payload.user) : null;
+
+      // Extrae el ID si existe
+      const id = userData?.Id ?? null;
+
+      return id;
+    } catch (e) {
+      console.error('Error al decodificar el token:', e);
+      return null;
     }
   }
 }

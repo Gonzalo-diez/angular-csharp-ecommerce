@@ -47,7 +47,7 @@ export class ProductSubcategoryComponent implements OnInit {
         next: (data) => {
           this.subcategoryProducts = data.map((product) => ({
             ...product,
-            category: Object.values(ProductCategory)[Number(product.category)] as ProductCategory,
+            category: product.category as ProductCategory,
           }));
 
           this.filteredProducts = [...this.subcategoryProducts];

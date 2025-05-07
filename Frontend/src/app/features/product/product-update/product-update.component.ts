@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ProductService } from '../../../core/services/product/product.service';
-import { ProductModel } from '../../../core/models/product/product.model';
 import { CommonModule } from '@angular/common';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { ProductService } from '../../../core/services/product/product.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { ProductModel } from '../../../core/models/product/product.model';
 
 @Component({
   selector: 'app-product-update',
@@ -15,6 +16,7 @@ import { catchError } from 'rxjs/operators';
   styleUrls: ['./product-update.component.css']
 })
 export class ProductUpdateComponent implements OnInit {
+  userId: number | null = null;
   productForm!: FormGroup;
   selectedImage?: File;
   productId!: number;
@@ -33,11 +35,25 @@ export class ProductUpdateComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
+    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    // Se obtiene el userId del usuario a traves del authService
+    if (this.authService.isAuthenticated()) {
+      const token = this.authService.getToken();
+      if (token) {
+        this.userId = this.decodeToken(token);
+      }
+    }
+
+    // En caso de que el userId no sea el que creo el producto lo envia al inicio
+    if (this.userId != this.product?.ownerId) {
+      this.router.navigate(['/']);
+    }
+
     this.productId = Number(this.route.snapshot.paramMap.get('id'));  
 
     // Inicializar formulario con valores predeterminados para evitar errores
@@ -115,5 +131,25 @@ export class ProductUpdateComponent implements OnInit {
       },
       error: (error) => console.error('Error al actualizar el producto:', error)
     });
+  }
+
+  private decodeToken(token: string): number | null {
+    try {
+      const base64Url = token.split('.')[1]; // Extrae la parte del payload del JWT
+      if (!base64Url) return null;
+
+      const payload = JSON.parse(atob(base64Url)); // Decodifica el payload
+
+      // Verifica si existe la propiedad "user" y conviértela en objeto
+      const userData = payload.user ? JSON.parse(payload.user) : null;
+
+      // Extrae el ID si existe
+      const id = userData?.Id ?? null;
+
+      return id;
+    } catch (e) {
+      console.error('Error al decodificar el token:', e);
+      return null;
+    }
   }
 }
