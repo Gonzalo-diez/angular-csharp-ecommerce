@@ -150,4 +150,4 @@ flutter test
 
 **Gonzalo Juan Diez Buchanan**
 
-[GitHub]('https://github.com/Gonzalo-diez')
+[@GitHub]('https://github.com/Gonzalo-diez')
